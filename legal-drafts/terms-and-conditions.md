@@ -18,7 +18,7 @@ Proposed website and service-enquiry terms. This draft does not create a contrac
 
 These proposed terms concern the Nexadly corporate information website. Browsing, preparing an email or downloading a brief does not create an order or a paid project agreement.
 
-> **Review required:** The owner has supplied the name **Nexadly Technologies Private Limited**. Match it against the official incorporation certificate and confirm incorporation status before identifying it as the contracting entity or data controller. No certificate, registration number, registered address or Canadian entity documentation has been reviewed for these drafts. The stated Canadian Adgrowly registration and its legal relationship to Nexadly remain to be verified.
+> **Review required:** The owner has supplied the name **Nexadly Technologies Private Limited**. Match it against the official incorporation certificate and confirm incorporation status before identifying it as the contracting entity or data controller. The owner supplied the registered office at RK Garden, New BEL Road, RMV 2nd Stage, Bangalore, Karnataka 560054, India. Supporting incorporation documents and registration numbers have not been reviewed. Any legal relationship with Adgrowly remains to be verified.
 
 The final project agreement should identify the verified contracting entity, authorized signatories and the relationship between that agreement and any website terms.
 

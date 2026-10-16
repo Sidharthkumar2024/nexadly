@@ -18,7 +18,7 @@ A proposed framework for corporate project enquiries. Commercial rules must be a
 
 This draft is for Nexadly’s corporate service projects, such as website, software, automation and marketing work. It is not a SaaS subscription cancellation policy.
 
-> **Review required:** The owner has supplied the name **Nexadly Technologies Private Limited**. Match it against the official incorporation certificate and confirm incorporation status before identifying it as the contracting entity or data controller. No certificate, registration number, registered address or Canadian entity documentation has been reviewed for these drafts. The stated Canadian Adgrowly registration and its legal relationship to Nexadly remain to be verified.
+> **Review required:** The owner has supplied the name **Nexadly Technologies Private Limited**. Match it against the official incorporation certificate and confirm incorporation status before identifying it as the contracting entity or data controller. The owner supplied the registered office at RK Garden, New BEL Road, RMV 2nd Stage, Bangalore, Karnataka 560054, India. Supporting incorporation documents and registration numbers have not been reviewed. Any legal relationship with Adgrowly remains to be verified.
 
 The current corporate website prepares enquiries and contains no payment checkout. Sending an enquiry or downloading a brief does not make a purchase.
 

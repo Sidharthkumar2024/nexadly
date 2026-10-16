@@ -17,3 +17,8 @@
 @media(min-width:1001px){.dropdown-panel{max-height:calc(100svh - 100px);overflow-y:auto}}
 @media(max-width:700px){.footer-service-directory>div{grid-template-columns:1fr 1fr;gap:12px 20px}.footer-service-directory a{font-size:11px}.footer-legal{gap:14px 20px}.footer-contact-note{max-width:none}}
 @media(max-width:380px){.footer-service-directory>div{grid-template-columns:1fr}.footer-top{gap:32px 16px}.footer-top>div:last-child{grid-column:1/-1}}
+
+.footer-brand .footer-office-label{font:10px var(--mono);letter-spacing:1px;color:#536344;margin:22px 0 9px}
+.footer-address{font-style:normal;font-size:12px;line-height:1.8;color:#39482e;max-width:290px}
+.nx-office-details{padding:24px 0;border-top:1px solid var(--line);margin-top:24px}
+.nx-office-address{font-style:normal;font-size:16px;line-height:1.8;color:#39482e}

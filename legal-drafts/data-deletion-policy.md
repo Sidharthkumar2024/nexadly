@@ -18,7 +18,7 @@ A proposed process for requests about corporate correspondence, with clear limit
 
 This draft addresses information related to Nexadly’s corporate website and enquiries. It does not establish a deletion endpoint or account-deletion process for a SaaS product.
 
-> **Review required:** The owner has supplied the name **Nexadly Technologies Private Limited**. Match it against the official incorporation certificate and confirm incorporation status before identifying it as the contracting entity or data controller. No certificate, registration number, registered address or Canadian entity documentation has been reviewed for these drafts. The stated Canadian Adgrowly registration and its legal relationship to Nexadly remain to be verified.
+> **Review required:** The owner has supplied the name **Nexadly Technologies Private Limited**. Match it against the official incorporation certificate and confirm incorporation status before identifying it as the contracting entity or data controller. The owner supplied the registered office at RK Garden, New BEL Road, RMV 2nd Stage, Bangalore, Karnataka 560054, India. Supporting incorporation documents and registration numbers have not been reviewed. Any legal relationship with Adgrowly remains to be verified.
 
 The website currently has no Nexadly account system, enquiry database or direct form-submission backend. Delivered emails can exist in the recipient mailbox and any systems used to handle them, which must be inventoried.
 

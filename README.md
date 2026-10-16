@@ -25,14 +25,14 @@ The ordinary build publishes only factual policy-status/contact pages at `/priva
 
 ## Company and content facts
 
-- Owner-provided company name: **Nexadly Technologies Private Limited**. The incorporation certificate has not been supplied or checked. No registration/incorporation claim, registry number, address or Canadian entity relationship is asserted. Organization structured data deliberately omits `legalName` until certificate verification.
+- Owner-provided company name: **Nexadly Technologies Private Limited**. The incorporation certificate has not been supplied or checked. The owner supplied the registered office at **RK Garden, New BEL Road, RMV 2nd Stage, Bangalore, Karnataka 560054, India**. No independently verified incorporation claim, registry number or formal relationship with another entity is asserted. Organization structured data deliberately omits `legalName` until certificate verification.
 - Positioning: **Technology, Marketing & Automation for Growth.**
 - All 18 requested services have dedicated pages. Existing Shopify, Digital Marketing and UI/UX pages are retained, making 21 service pages. Each includes scoped capabilities, process, deliverables, FAQs and enquiry links.
 - Corporate services are scoped through separate project proposals. Product subscriptions, accounts, support and policies belong to the relevant SaaS product; an implementation quote does not automatically include a subscription.
 - Product domains: CallVani https://callvani.com, Adgrowly https://adgrowly.ca, ChairManage https://chairmanage.com and SwiftUPI https://swiftupi.com. Product detail slugs remain stable, including `/products/chair-manage/`.
-- ChairManage feature content comes from the original user-supplied specification. SwiftUPI content retains previously sourced official product information; its site could not be fetched during the current update. No new features, regulated-payment claims or product prices are inferred.
+- ChairManage covers salons, spas, cleaning businesses, restaurants and gyms, as approved by the owner. The detailed feature examples remain explicitly salon-specific; no unapproved capabilities or prices are inferred for other business types. SwiftUPI content retains previously sourced official product information; its site could not be fetched during the current update. No new features, regulated-payment claims or product prices are inferred.
 - Corporate quotations use **USD**. No fixed amount has been approved in USD; pricing remains a custom project quote.
-- The owner supplied the 100+ clients and Canada/US market statements. No customer quotations, partner badges, certifications, performance results or ratings are fabricated. Platform references describe services, not official endorsements.
+- The owner supplied the 100+ clients statement. Regional market positioning has been removed at the owner’s request. No customer quotations, partner badges, certifications, performance results or ratings are fabricated. Platform references describe services, not official endorsements.
 
 ## Contact and data flow
 
@@ -44,7 +44,7 @@ WhatsApp is conditional on `NEXADLY_WHATSAPP_NUMBER`, an owner-approved internat
 
 The existing Sites project remains owner-private and publishes only `dist/`. Default canonical URLs use the actual private preview origin, metadata is `noindex,nofollow`, robots disallows crawling, and its sitemap is intentionally empty. Titles, descriptions, social metadata, breadcrumbs and Organization/WebSite/WebPage/Service structured data are generated centrally.
 
-The requested production domain is **https://nexadly.com**. It currently serves a different site. The accessible Vercel project named `nexadly` currently lists only `nexadly.vercel.app`; no custom-domain connection has been established by this update. Domain ownership, hosting destination and legal review must be resolved before a public launch. Do not equate the Sites preview with a deployment to nexadly.com.
+The requested production domain is **https://nexadly.com**. The owner removed the previous Vercel DNS records. The authorized destination is an isolated Nexadly release on the existing VPS alongside Adgrowly. DNS, TLS and the public response must be verified after the new server configuration is active. Do not equate the Sites preview with a deployment to nexadly.com.
 
 After that launch is approved and routed, set `SITE_ORIGIN=https://nexadly.com` and `SITE_INDEXING=public` for the appropriate production build. This enables public sitemap and robots output for normal content while the unapproved policy-status pages remain noindex. Do not change the hosting manifest to `review-dist`.
 

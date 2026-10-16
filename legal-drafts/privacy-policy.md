@@ -18,7 +18,7 @@ Proposed disclosure for the corporate website and enquiries, based on the curren
 
 This draft is intended for the prepared Nexadly corporate website version, with nexadly.com as the intended future corporate domain. The implementation findings here apply to this Sites version, not to the different website currently served at nexadly.com. It covers website browsing and business enquiries, not the internal processing of client projects or SaaS products.
 
-> **Review required:** The owner has supplied the name **Nexadly Technologies Private Limited**. Match it against the official incorporation certificate and confirm incorporation status before identifying it as the contracting entity or data controller. No certificate, registration number, registered address or Canadian entity documentation has been reviewed for these drafts. The stated Canadian Adgrowly registration and its legal relationship to Nexadly remain to be verified.
+> **Review required:** The owner has supplied the name **Nexadly Technologies Private Limited**. Match it against the official incorporation certificate and confirm incorporation status before identifying it as the contracting entity or data controller. The owner supplied the registered office at RK Garden, New BEL Road, RMV 2nd Stage, Bangalore, Karnataka 560054, India. Supporting incorporation documents and registration numbers have not been reviewed. Any legal relationship with Adgrowly remains to be verified.
 
 This corporate document concerns Nexadly’s website and service enquiries. It does not set subscription, payment, account, cancellation or privacy terms for [Adgrowly](https://adgrowly.ca), [CallVani](https://callvani.com), [ChairManage](https://chairmanage.com) and [SwiftUPI](https://swiftupi.com). Review the notices and contact options on the relevant official product website. A corporate enquiry does not create or cancel a SaaS subscription.
 
@@ -50,7 +50,7 @@ This version’s Nexadly application code does not set cookies, write enquiry da
 
 Downloads and unsent drafts remain under the visitor’s device and email-app controls. Delivered correspondence may be stored in the recipient mailbox and its provider systems. No retention duration or storage location has yet been approved for this draft.
 
-Provider processing may occur outside the visitor’s country. The company’s Canada and US market focus does not establish data residency there.
+Provider processing may occur outside the visitor’s country. The actual provider locations and processing arrangements must be verified independently.
 
 > **Review required:** Approve a data inventory and retention schedule for enquiries, contracts, billing, requests, logs and backups; record deletion methods and any justified retention requirements. Verify access controls, incident procedures, provider contracts, international transfer requirements and locations. Do not claim encryption, certifications, security guarantees or country-specific hosting without evidence.
 
