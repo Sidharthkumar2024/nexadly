@@ -441,7 +441,7 @@ pages['/about/'] = {
     ['Continuous support','Plan maintenance, optimization and technical assistance through agreed support arrangements.']
   ].map(([title,body],index)=>card(`0${index+1}`,title,body)).join('')}</div></section>
   <section class="nx-soft-section"><div class="container section"><div class="nx-section-intro"><p class="eyebrow">HOW WE APPROACH A PROJECT</p><h2>Good work starts<br> with understanding.</h2></div>${process}</div></section>
-  <section class="container nx-company-note"><p><strong>Company status:</strong> Nexadly is the brand name. Nexadly Private Limited is the proposed legal company name, pending incorporation.</p></section>${cta()}`)
+  ${cta()}`)
 };
 
 pages['/pricing/'] = {

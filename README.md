@@ -17,7 +17,7 @@ Open http://localhost:4377. Run `npm run build` after changes; `npm run check` c
 - Latest approved SwiftUPI domain: **https://swiftupi.com**. Product details are based on the public official website; payment verification depends on the configured source. No pricing or regulated-payment guarantees are asserted.
 - Chair Manage capabilities come from the user-supplied approved specification.
 - CallVani and Adgrowly reference their official websites and the supplied specification. Illustrative product UI is explicitly labelled and is not presented as production usage or customer results.
-- Nexadly Private Limited is a proposed company name; incorporation is not represented as complete.
+- Public website branding uses Nexadly; the project agreement identifies the contracting party.
 - Project pricing is presented in US dollars (USD). No fixed USD amount or package inclusions are inferred; the written proposal confirms the price, scope and additional costs. Shopify has a separate service page, without an assumed fixed package price.
 - The owner stated that Nexadly has worked with 100+ clients and primarily serves Canada and the United States. No client names, logos, testimonials, ratings, results or affiliations are fabricated.
 - All 19 service pages include tailored deliverables, a delivery process, FAQs and enquiry links. Terms and Privacy pages reflect the current static-site behavior; legal operator/contact address and actual mailbox retention/hosting arrangements still need confirmation before public launch.
