@@ -30,6 +30,7 @@ Code inspected on 16 October 2026; this is a review date, not a policy effective
 | Site hosting | `.openai/hosting.json` and existing private preview | Current preview is on ChatGPT Sites; account authentication is handled by the platform. Production hosting, logs, contract and data locations need confirmation. |
 | Payments/accounts | Current corporate application | No corporate checkout, customer login, direct form backend or enquiry database. This finding does not cover linked SaaS products. |
 | Company name | Direct owner statement | **Nexadly Technologies Private Limited** is owner-provided; no certificate or registration evidence has been reviewed. |
+| Registered office | Direct owner statement | RK Garden, New BEL Road, RMV 2nd Stage, Bangalore, Karnataka 560054, India. Approved for the corporate contact pages; supporting registration documents have not been reviewed. |
 | Canada | Direct owner statement | Owner says registered in Canada under Adgrowly. Exact legal entity, registration and relationship to Nexadly are unverified. |
 | Currency | Direct owner instruction | Corporate quotations use USD. No fixed USD package amount or universal refund rule has been approved. |
 
@@ -38,7 +39,7 @@ Code inspected on 16 October 2026; this is a review date, not a policy effective
 - [ ] Match the full legal name exactly to the official incorporation certificate. Confirm incorporation status before calling the entity incorporated or registered.
 - [ ] Confirm the website operator, contracting entity, data controller, authorized signatory and required business disclosures. Add only verified registration details and contact/address information.
 - [ ] Verify Adgrowly's Canadian legal identity and its relationship to the corporate business. Do not infer branch, subsidiary, affiliate, controller or contracting status.
-- [ ] Confirm the production domain and host, including migration from the different current nexadly.com site. Re-audit the deployed version rather than treating this preview inventory as evidence of the existing production backend. Inventory host logs, site cookies, external resources, access permissions, processing locations and provider contracts.
+- [ ] Confirm the public deployment to nexadly.com on the owner's existing VPS. The owner removed the previous Vercel DNS records; server activation, new DNS records and TLS remain separate verification steps. Re-audit the deployed version rather than treating this preview inventory as evidence of the production backend. Inventory host logs, site cookies, external resources, access permissions, processing locations and provider contracts.
 - [ ] Identify email, CRM, project-management and storage providers actually used after an enquiry arrives. Confirm staff access and any contractor disclosure.
 - [ ] Approve processing purposes, applicable grounds, retention periods, safeguards, international-transfer arrangements, complaint routes, any required privacy officer/representative, and treatment of minors' information.
 - [ ] Complete the production cookie/storage inventory and determine required controls before adding optional tracking. Decide whether to self-host fonts.

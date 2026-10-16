@@ -1,0 +1,389 @@
+#!/usr/bin/env python3
+"""Two-phase Nexadly deployment. Run as root on the target Docker host.
+
+  python3 nexadly-bootstrap.py prepare /path/to/archive.tar.gz
+  python3 nexadly-bootstrap.py activate
+
+Never removes files/containers, stops an existing service, or changes DNS.
+Preparation creates only /opt/nexadly paths and the new isolated container.
+Activation appends the reviewed host blocks to the existing proxy config.
+"""
+import argparse
+import fcntl
+import hashlib
+import io
+import json
+import os
+from pathlib import Path, PurePosixPath
+import re
+import signal
+import subprocess
+import sys
+import tarfile
+import time
+
+COMMIT = '__COMMIT__'
+ARCHIVE_SHA = '__ARCHIVE_SHA__'
+MANIFEST_SHA = '__MANIFEST_SHA__'
+CONTENT_FILES = __CONTENT_FILES__
+HTML_FILES = __HTML_FILES__
+BASE = Path('/opt/nexadly')
+WWW = BASE / 'www'
+CURRENT = WWW / 'current'
+RELEASE = WWW / ('releases/' + COMMIT)
+BACKUPS = BASE / 'backups/bootstrap-__RELEASE_SHORT__'
+STATE = BACKUPS / 'deployment.json'
+STATIC_CONFIG = BASE / 'Caddyfile.nexadly-static'
+PROXY_CONFIG = Path('/opt/adgrowly-gmb/deploy/Caddyfile')
+PROXY = 'adgrowly-gmb-caddy-1'
+CONTAINER = 'nexadly-corporate'
+NETWORK = 'adgrowly-gmb_frontend'
+CONFIG = b'''{
+\tadmin off
+\tauto_https off
+}
+
+:8080 {
+\troot * /srv/current
+\tencode zstd gzip
+
+\tfile_server {
+\t\thide /srv/current/deployment-manifest.json
+\t}
+
+\thandle_errors 404 {
+\t\trewrite * /404.html
+\t\tfile_server
+\t}
+}
+'''
+APPEND = b'''
+
+# BEGIN NEXADLY CORPORATE __RELEASE_SHORT__
+nexadly.com {
+\timport security_headers
+\treverse_proxy nexadly-corporate:8080 {
+\t\thealth_uri /
+\t\thealth_interval 30s
+\t\thealth_timeout 3s
+\t\thealth_status 200
+\t\thealth_body Nexadly
+\t}
+}
+
+www.nexadly.com {
+\timport security_headers
+\tredir https://nexadly.com{uri} permanent
+}
+# END NEXADLY CORPORATE __RELEASE_SHORT__
+'''
+
+
+def require(condition, message):
+    if not condition:
+        raise RuntimeError(message)
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def command(args, data=None, allow_failure=False):
+    result = subprocess.run(args, input=data, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, timeout=60)
+    if result.returncode and not allow_failure:
+        # Config errors may contain existing private configuration. Keep them local.
+        if BACKUPS.is_dir():
+            path = BACKUPS / ('diagnostic-%s.log' % time.time_ns())
+            write_new(path, result.stdout + b'\n' + result.stderr, 0o600)
+        raise RuntimeError('%s failed (exit %s); see private diagnostics' %
+                           (' '.join(args[:4]), result.returncode))
+    return result
+
+
+def inspect(name):
+    return json.loads(command(['docker', 'container', 'inspect', name]).stdout)[0]
+
+
+def mkdir_checked(path, mode=0o755, new=False):
+    require(path.is_absolute(), 'Directory must be absolute')
+    for parent in reversed(path.parents):
+        if parent.exists() or parent.is_symlink():
+            require(not parent.is_symlink() and parent.is_dir(),
+                    'Unsafe directory ancestor: %s' % parent)
+    if new:
+        path.mkdir(mode=mode)
+    else:
+        path.mkdir(mode=mode, parents=True, exist_ok=True)
+    require(not path.is_symlink() and path.is_dir(), 'Unsafe directory: %s' % path)
+
+
+def write_new(path, data, mode):
+    fd = os.open(str(path), os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, mode)
+    with os.fdopen(fd, 'wb') as output:
+        output.write(data)
+        output.flush()
+        os.fsync(output.fileno())
+    os.chmod(str(path), mode)
+
+
+def regular_bytes(path):
+    require(not path.is_symlink() and path.is_file(), 'Expected regular file: %s' % path)
+    return path.read_bytes()
+
+
+def mounted_config():
+    return command(['docker', 'exec', PROXY, 'cat', '/etc/caddy/Caddyfile']).stdout
+
+
+def validate_candidate(data):
+    command(['docker', 'exec', '-i', '-w', '/etc/caddy', PROXY,
+             'caddy', 'validate', '--config', '-', '--adapter', 'caddyfile'], data)
+
+
+def check_runtime_config(expected):
+    adapted = command(['docker', 'exec', '-i', '-w', '/etc/caddy', PROXY,
+                       'caddy', 'adapt', '--config', '-', '--adapter', 'caddyfile'], expected)
+    active = command(['docker', 'exec', PROXY, 'wget', '-q', '-O', '-',
+                      'http://127.0.0.1:2019/config/'])
+    require(json.loads(adapted.stdout) == json.loads(active.stdout),
+            'Running proxy configuration differs from the Caddyfile; manual review required')
+
+
+def check_backend():
+    for route, expected in [('/', 200), ('/__nexadly_missing___RELEASE_SHORT____/', 404)]:
+        result = command(['docker', 'exec', PROXY, 'wget', '-T', '5', '-S', '-O', '-',
+                          'http://%s:8080%s' % (CONTAINER, route)], allow_failure=True)
+        statuses = re.findall(rb'HTTP/\d(?:\.\d)?\s+(\d{3})', result.stderr)
+        require(statuses and all(int(code) == expected for code in statuses),
+                'Backend did not return expected HTTP %s for %s' % (expected, route))
+        if expected == 200:
+            require(result.returncode == 0 and b'Nexadly' in result.stdout,
+                    'Backend did not serve the Nexadly homepage')
+
+
+def check_release():
+    require(not RELEASE.is_symlink() and RELEASE.is_dir(), 'Release directory changed')
+    data = regular_bytes(RELEASE / 'deployment-manifest.json')
+    require(sha(data) == MANIFEST_SHA, 'Release manifest checksum changed')
+    manifest = json.loads(data)
+    require(manifest['sourceCommit'] == COMMIT and manifest['origin'] == 'https://nexadly.com'
+            and manifest['indexing'] == 'public' and len(manifest['files']) == CONTENT_FILES,
+            'Unexpected deployment manifest')
+    observed = set()
+    for path in RELEASE.rglob('*'):
+        require(not path.is_symlink() and (path.is_file() or path.is_dir()),
+                'Unexpected release filesystem entry')
+        if path.is_file():
+            observed.add(path.relative_to(RELEASE).as_posix())
+    require(observed == set(manifest['files']) | {'deployment-manifest.json'},
+            'Release file set changed')
+    for name, checksum in manifest['files'].items():
+        relative = PurePosixPath(name)
+        require(not relative.is_absolute() and '..' not in relative.parts,
+                'Unsafe manifest path')
+        require(sha(regular_bytes(RELEASE / name)) == checksum, 'Release checksum mismatch: ' + name)
+    require(regular_bytes(STATIC_CONFIG) == CONFIG, 'Static Caddy configuration changed')
+    require(CURRENT.is_symlink() and os.readlink(str(CURRENT)) == 'releases/' + COMMIT,
+            'Initial current pointer changed')
+
+
+def preflight_proxy():
+    proxy = inspect(PROXY)
+    require(proxy['State']['Running'], 'Existing proxy is not running')
+    require(NETWORK in proxy['NetworkSettings']['Networks'], 'Proxy lacks expected network')
+    mounts = [m for m in proxy['Mounts'] if m['Destination'] == '/etc/caddy/Caddyfile']
+    require(len(mounts) == 1 and mounts[0]['Source'] == str(PROXY_CONFIG)
+            and not mounts[0]['RW'], 'Unexpected existing proxy Caddyfile mount')
+    command(['docker', 'network', 'inspect', NETWORK])
+    command(['docker', 'exec', PROXY, 'sh', '-c', 'command -v wget >/dev/null'])
+    original = regular_bytes(PROXY_CONFIG)
+    require(mounted_config() == original, 'Host and mounted proxy config differ')
+    check_runtime_config(original)
+    return proxy, original
+
+
+def prepare(archive):
+    archive_data = regular_bytes(archive)
+    require(sha(archive_data) == ARCHIVE_SHA, 'Archive SHA-256 mismatch')
+    require(not RELEASE.exists() and not RELEASE.is_symlink(), 'Release path already exists')
+    require(not CURRENT.exists() and not CURRENT.is_symlink(), 'Current pointer already exists')
+    require(not BACKUPS.exists() and not BACKUPS.is_symlink(), 'Backup/state path already exists')
+    require(not STATIC_CONFIG.exists() and not STATIC_CONFIG.is_symlink(), 'Static config already exists')
+    names = command(['docker', 'ps', '-a', '--filter', 'name=^/%s$' % CONTAINER,
+                     '--format', '{{.Names}}']).stdout.strip()
+    require(not names, 'Nexadly container already exists')
+    proxy, original = preflight_proxy()
+    require(b'nexadly.com' not in original.lower(), 'Proxy config already mentions Nexadly')
+    original_stat = PROXY_CONFIG.stat()
+    # Fully verify the exact archive before any deployment files are created.
+    contents = {}
+    with tarfile.open(fileobj=io.BytesIO(archive_data), mode='r:gz') as package:
+        members = package.getmembers()
+        require(len(members) == CONTENT_FILES + 1 and sum(m.size for m in members) < 64 * 1024 * 1024,
+                'Unexpected archive file count or expanded size')
+        for member in members:
+            path = PurePosixPath(member.name)
+            require(member.isfile() and not path.is_absolute() and '..' not in path.parts
+                    and '.' not in path.parts and str(path) == member.name
+                    and member.name not in contents and not member.pax_headers,
+                    'Unsafe or duplicate archive member')
+            contents[member.name] = package.extractfile(member).read()
+    manifest = json.loads(contents['deployment-manifest.json'])
+    require(manifest['sourceCommit'] == COMMIT and manifest['origin'] == 'https://nexadly.com'
+            and manifest['indexing'] == 'public' and manifest['htmlFiles'] == HTML_FILES,
+            'Unexpected archive manifest')
+    require(set(contents) == set(manifest['files']) | {'deployment-manifest.json'},
+            'Manifest file set mismatch')
+    require(sha(contents['deployment-manifest.json']) == MANIFEST_SHA, 'Manifest checksum mismatch')
+    for name, checksum in manifest['files'].items():
+        require(sha(contents[name]) == checksum, 'Archive content checksum mismatch')
+        require(b'data-legal-review="true"' not in contents[name], 'Legal draft found in archive')
+    mkdir_checked(BASE)
+    mkdir_checked(WWW)
+    mkdir_checked(WWW / 'releases')
+    mkdir_checked(BASE / 'backups', 0o700)
+    mkdir_checked(RELEASE, new=True)
+    mkdir_checked(BACKUPS, 0o700, new=True)
+    for name, data in contents.items():
+        target = RELEASE / name
+        mkdir_checked(target.parent)
+        write_new(target, data, 0o644)
+    write_new(STATIC_CONFIG, CONFIG, 0o644)
+    os.symlink('releases/' + COMMIT, str(CURRENT))
+    write_new(BACKUPS / 'Caddyfile.original', original, 0o600)
+    write_new(BACKUPS / 'Caddyfile.candidate', original + APPEND, 0o600)
+    check_release()
+    container = command(['docker', 'run', '-d', '--pull=never', '--name', CONTAINER,
+                         '--network', NETWORK, '--restart', 'unless-stopped',
+                         '--mount', 'type=bind,src=%s,dst=/srv,readonly' % WWW,
+                         '--mount', 'type=bind,src=%s,dst=/etc/caddy/Caddyfile,readonly' % STATIC_CONFIG,
+                         '--health-cmd', 'body=$(wget -q -O - http://127.0.0.1:8080/) && printf \'%s\' "$body" | grep -q Nexadly',
+                         '--health-interval', '30s', '--health-timeout', '5s',
+                         '--health-retries', '3', proxy['Image'],
+                         'caddy', 'run', '--config', '/etc/caddy/Caddyfile', '--adapter', 'caddyfile'])
+    for attempt in range(10):
+        try:
+            check_backend()
+            break
+        except RuntimeError:
+            if attempt == 9:
+                raise
+            time.sleep(1)
+    validate_candidate(original + APPEND)
+    require(regular_bytes(PROXY_CONFIG) == original and PROXY_CONFIG.stat().st_ino == original_stat.st_ino,
+            'Existing proxy config changed during preparation')
+    state = {'commit': COMMIT, 'archive_sha256': ARCHIVE_SHA, 'image': proxy['Image'],
+             'container_id': container.stdout.decode().strip(),
+             'proxy_container_id': proxy['Id'], 'original_sha256': sha(original),
+             'candidate_sha256': sha(original + APPEND),
+             'original_inode': original_stat.st_ino, 'original_device': original_stat.st_dev,
+             'release_inode': RELEASE.stat().st_ino, 'release_device': RELEASE.stat().st_dev,
+             'www_inode': WWW.stat().st_ino, 'www_device': WWW.stat().st_dev}
+    write_new(STATE, (json.dumps(state, indent=2) + '\n').encode(), 0o600)
+    print('PREPARED: isolated Nexadly container serves homepage and genuine 404; candidate validates.')
+    print('Existing proxy config unchanged. State: %s' % STATE)
+    print('Public domain activation has not run. DNS and TLS remain separate checks.')
+
+
+def activate():
+    state = json.loads(regular_bytes(STATE))
+    require(state['commit'] == COMMIT and state['archive_sha256'] == ARCHIVE_SHA, 'Unexpected state')
+    require(not (BACKUPS / 'activation.json').exists(), 'Activation already recorded')
+    original = regular_bytes(BACKUPS / 'Caddyfile.original')
+    candidate = regular_bytes(BACKUPS / 'Caddyfile.candidate')
+    require(sha(original) == state['original_sha256'] and candidate == original + APPEND
+            and sha(candidate) == state['candidate_sha256'], 'Backup/candidate changed')
+    proxy, current = preflight_proxy()
+    require(proxy['Id'] == state['proxy_container_id'], 'Proxy container identity changed')
+    require(current == original, 'Proxy config changed since preparation')
+    backend = inspect(CONTAINER)
+    require(backend['Id'] == state['container_id'] and backend['Image'] == state['image']
+            and backend['State']['Running'], 'Backend container identity/state changed')
+    require(NETWORK in backend['NetworkSettings']['Networks'], 'Backend network membership changed')
+    require(not backend['HostConfig']['PortBindings'], 'Backend unexpectedly publishes host ports')
+    for destination, source in [('/srv', WWW), ('/etc/caddy/Caddyfile', STATIC_CONFIG)]:
+        mounts = [m for m in backend['Mounts'] if m['Destination'] == destination]
+        require(len(mounts) == 1 and mounts[0]['Source'] == str(source) and not mounts[0]['RW'],
+                'Backend mount changed')
+    check_release()
+    require(WWW.stat().st_ino == state['www_inode'] and WWW.stat().st_dev == state['www_device'],
+            'Bound www directory changed')
+    require(RELEASE.stat().st_ino == state['release_inode']
+            and RELEASE.stat().st_dev == state['release_device'], 'Bound release directory changed')
+    check_backend()
+    validate_candidate(candidate)
+    # The bound file inode is preserved. No rename, deletion or restart is used.
+    fd = os.open(str(PROXY_CONFIG), os.O_RDWR | os.O_NOFOLLOW)
+    with os.fdopen(fd, 'r+b', buffering=0) as config:
+        fcntl.flock(config, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        info = os.fstat(config.fileno())
+        require(info.st_ino == state['original_inode'] and info.st_dev == state['original_device'],
+                'Proxy config inode changed')
+        require(config.read() == original, 'Proxy config changed before append')
+        try:
+            require(config.write(APPEND) == len(APPEND), 'Incomplete proxy configuration append')
+            config.flush()
+            os.fsync(config.fileno())
+            require(mounted_config() == candidate, 'Proxy cannot see expected candidate bytes')
+            command(['docker', 'exec', '-w', '/etc/caddy', PROXY, 'caddy', 'validate',
+                     '--config', '/etc/caddy/Caddyfile', '--adapter', 'caddyfile'])
+            command(['docker', 'exec', '-w', '/etc/caddy', PROXY, 'caddy', 'reload',
+                     '--config', '/etc/caddy/Caddyfile', '--adapter', 'caddyfile'])
+            check_runtime_config(candidate)
+            check_backend()
+            activation_record = BACKUPS / ('activation-record-%s.json' % time.time_ns())
+            write_new(activation_record, (json.dumps({'commit': COMMIT,
+                      'candidate_sha256': sha(candidate),
+                      'activated_unix': int(time.time())}) + '\n').encode(), 0o600)
+            # Hard-link only the fully written record; partial records remain for inspection.
+            os.link(str(activation_record), str(BACKUPS / 'activation.json'))
+        except BaseException as failure:
+            config.seek(0)
+            observed = config.read()
+            info = os.fstat(config.fileno())
+            safe_prefix = observed.startswith(original) and APPEND.startswith(observed[len(original):])
+            if not (safe_prefix and info.st_ino == state['original_inode']
+                    and info.st_dev == state['original_device']
+                    and PROXY_CONFIG.stat().st_ino == info.st_ino
+                    and mounted_config() == observed):
+                raise RuntimeError('Activation failed and config drift prevents automatic rollback; '
+                                   'original backup retained at %s' % BACKUPS) from failure
+            # Remove only our complete/partial append; do not rewrite any original bytes.
+            config.truncate(len(original))
+            config.flush()
+            os.fsync(config.fileno())
+            require(mounted_config() == original, 'Rollback bytes not visible inside proxy')
+            command(['docker', 'exec', '-w', '/etc/caddy', PROXY, 'caddy', 'reload',
+                     '--config', '/etc/caddy/Caddyfile', '--adapter', 'caddyfile'])
+            check_runtime_config(original)
+            raise RuntimeError('Activation failed; original proxy bytes restored and reloaded. '
+                               'All new files/container retained for inspection.') from failure
+    print('ACTIVATED: Nexadly host blocks appended and gracefully reloaded; original prefix preserved.')
+    print('Existing application/container was not stopped or deleted. Verify Adgrowly separately.')
+    print('DNS routing, TLS issuance and public-domain response still require independent verification.')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    subcommands = parser.add_subparsers(dest='phase', required=True)
+    prep = subcommands.add_parser('prepare')
+    prep.add_argument('archive', type=Path)
+    subcommands.add_parser('activate')
+    args = parser.parse_args()
+    require(os.geteuid() == 0, 'Run as root on the intended Docker host')
+    def interrupted(signum, frame):
+        raise InterruptedError('Termination requested')
+    signal.signal(signal.SIGTERM, interrupted)
+    if args.phase == 'prepare':
+        prepare(args.archive.resolve())
+    else:
+        activate()
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as error:
+        print('STOPPED: %s' % error, file=sys.stderr)
+        sys.exit(1)

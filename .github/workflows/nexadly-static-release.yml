@@ -1,0 +1,45 @@
+name: Build Nexadly production release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nexadly-production-release
+  cancel-in-progress: true
+
+jobs:
+  release:
+    if: github.repository == 'Sidharthkumar2024/nexadly' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      SITE_ORIGIN: https://nexadly.com
+      SITE_INDEXING: public
+      NEXADLY_RELEASE_DIR: ${{ runner.temp }}/nexadly-release
+    steps:
+      - name: Check out this exact main commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - name: Build and validate the public static site
+        run: |
+          npm run build
+          npm run check
+          python3 -m unittest discover -s deploy/tests -p 'test_*.py'
+      - name: Package static files and checksums
+        run: python3 deploy/package_static.py --dist dist --commit "$GITHUB_SHA" --output-dir "$NEXADLY_RELEASE_DIR"
+      - name: Publish checked static release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 deploy/publish_release.py

@@ -1,0 +1,45 @@
+[Unit]
+Description=Verify and activate Nexadly static GitHub releases
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=nexadly-updater
+Group=nexadly-updater
+ExecStart=/usr/bin/python3 -I -B /opt/nexadly/bin/updater.py
+WorkingDirectory=/var/lib/nexadly-updater
+LoadCredential=github-token:/etc/nexadly/github-token
+StateDirectory=nexadly-updater
+StateDirectoryMode=0700
+UMask=0022
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/nexadly/www /var/lib/nexadly-updater
+PrivateTmp=true
+PrivateDevices=true
+NoNewPrivileges=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+InaccessiblePaths=-/run/docker.sock -/var/run/docker.sock -/run/dbus/system_bus_socket -/run/systemd/private
+Environment=PYTHONUNBUFFERED=1
+TimeoutStartSec=180
+MemoryMax=384M
+TasksMax=16
+Nice=10
+
