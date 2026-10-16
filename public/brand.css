@@ -1,11 +1,11 @@
 /* Keep the approved transparent ribbon artwork integrated with the header. */
 .brand{display:block;flex-shrink:0;line-height:0;white-space:normal;letter-spacing:normal}
 .brand-logo{display:block;width:100%;height:auto;object-fit:contain}
-.site-header .brand{width:208px;padding:0;transition:opacity .25s ease}
-.site-header .brand:hover{opacity:.86}
-.site-header.on-hero:not(.scrolled) .brand-logo{filter:brightness(0) invert(1)}
+.site-header .brand{width:208px;padding:0}
+/* Preserve the artwork's exact colors; soften the full header behind it. */
+.site-header.on-hero:not(.scrolled){color:var(--ink)}
+.site-header.on-hero:not(.scrolled)::before{content:'';position:absolute;inset:0 0 -48px;z-index:-1;background:linear-gradient(180deg,#f8f9f3 0%,#f8f9f3f2 52%,#f8f9f3c2 68%,#f8f9f300 100%);pointer-events:none}
 .footer-brand .brand{width:min(320px,100%);max-width:100%}
 @media(min-width:1001px) and (max-width:1200px){.site-header .brand{width:175px}.nav-wrap{gap:15px}#main-nav{gap:12px;font-size:10px}}
 @media(max-width:700px){.site-header .brand{width:198px}.footer-brand .brand{width:min(320px,100%)}}
 @media(max-width:480px){.nav-cta{display:none}.site-header .brand{width:198px}.nav-wrap{gap:16px}}
-@media(prefers-reduced-motion:reduce){.site-header .brand{transition:none}}
