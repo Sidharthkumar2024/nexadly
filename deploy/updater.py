@@ -113,7 +113,9 @@ class SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
 
 
 class GitHubClient:
-    def __init__(self, token):
+    def __init__(self, token=None):
+        require(token is None or (isinstance(token, str) and bool(token)),
+                "Invalid GitHub authentication configuration.")
         self._token = token
         # Ignore inherited proxy settings. Normal TLS verification remains enabled.
         self._opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), SafeRedirectHandler())
@@ -125,7 +127,8 @@ class GitHubClient:
         headers = {"Accept": "application/octet-stream" if binary else "application/vnd.github+json",
                    "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "nexadly-static-updater"}
         request = urllib.request.Request(url, headers=headers, method="GET")
-        request.add_unredirected_header("Authorization", "Bearer " + self._token)
+        if self._token is not None:
+            request.add_unredirected_header("Authorization", "Bearer " + self._token)
         started = time.monotonic()
         try:
             with self._opener.open(request, timeout=REQUEST_TIMEOUT) as response:
@@ -503,13 +506,16 @@ def update(client, layout, dry_run=False):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--public", action="store_true",
+                        help="read the public repository without loading or sending credentials")
     parser.add_argument("--check", "--dry-run", dest="dry_run", action="store_true",
                         help="verify the release and local state without writing or switching anything")
     args = parser.parse_args(argv)
     try:
         require(os.getuid() != 0 and os.geteuid() != 0, "Refusing to run as root; use the dedicated updater account.")
         os.umask(0o022)
-        result = update(GitHubClient(read_token()), Layout(), dry_run=args.dry_run)
+        token = None if args.public else read_token()
+        result = update(GitHubClient(token), Layout(), dry_run=args.dry_run)
         print(result)
         return 0
     except SkipRelease as exc:

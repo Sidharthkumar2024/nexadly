@@ -83,6 +83,32 @@ class FakeClient:
         raise AssertionError("Unexpected mocked request")
 
 
+def public_transport(fake):
+    """Exercise real unauthenticated request construction against offline fixtures."""
+    class Response(io.BytesIO):
+        status = 200
+
+        def __init__(self, payload, url):
+            super().__init__(payload)
+            self.headers = {"Content-Length": str(len(payload))}
+            self.url = url
+
+        def geturl(self):
+            return self.url
+
+    client = updater.GitHubClient()
+    requests = []
+
+    def open_response(request, timeout):
+        requests.append(request)
+        payload = fake.get(request.full_url, 1024 * 1024)
+        return Response(payload, request.full_url)
+
+    client._opener = mock.Mock()
+    client._opener.open.side_effect = open_response
+    return client, requests
+
+
 class ValidationTests(unittest.TestCase):
     def setUp(self):
         self.manifest, self.raw, self.entries, self.archive, self.sums = fixture()
@@ -177,6 +203,17 @@ class ValidationTests(unittest.TestCase):
 
 
 class NetworkTests(unittest.TestCase):
+    def test_public_requests_omit_authorization_on_every_api_and_asset_request(self):
+        client, requests = public_transport(FakeClient())
+        sha, entries = updater.fetch_release(client)
+        self.assertEqual(sha, SHA)
+        self.assertIn("index.html", entries)
+        self.assertGreaterEqual(len(requests), 6)
+        for request in requests:
+            headers = {key.lower(): value for key, value in request.header_items()}
+            self.assertNotIn("authorization", headers)
+            self.assertNotIn("Bearer", str(headers))
+
     def test_redirect_strips_auth_and_cookies_for_same_and_cross_host(self):
         for url in [updater.API_ROOT + "/releases/assets/1",
                     "https://release-assets.githubusercontent.com/signed-asset?signature=test"]:
@@ -369,8 +406,44 @@ class InstallationTests(unittest.TestCase):
         self.assertIn("activated", message)
         self.assertEqual(os.readlink(self.www / "current"), "releases/" + SHA)
 
+    def test_public_mode_keeps_full_verification_and_atomic_activation(self):
+        client, requests = public_transport(FakeClient())
+        self.assertIn("activated", updater.update(client, self.layout))
+        self.assertEqual(os.readlink(self.www / "current"), "releases/" + SHA)
+        self.assertEqual(len(requests), 8)
+        self.assertTrue(updater.existing_release_matches(self.www / "releases" / SHA, self.entries))
+
+    def test_public_mode_rejects_invalid_hash_and_leaves_current_unchanged(self):
+        fake = FakeClient()
+        archive = fake.payloads[updater.ARCHIVE_NAME]
+        fake.payloads[updater.ARCHIVE_NAME] = bytes([archive[0] ^ 1]) + archive[1:]
+        client, _ = public_transport(fake)
+        with self.assertRaises(updater.UpdateError):
+            updater.update(client, self.layout)
+        self.assertEqual(os.readlink(self.www / "current"), "releases/" + OLD_SHA)
+        self.assertFalse((self.www / "releases" / SHA).exists())
+
 
 class CliTests(unittest.TestCase):
+    def test_public_check_does_not_read_credentials(self):
+        with mock.patch.object(updater.os, "getuid", return_value=1234), \
+                mock.patch.object(updater.os, "geteuid", return_value=1234), \
+                mock.patch.object(updater, "read_token", side_effect=AssertionError("Public mode must not read token")), \
+                mock.patch.object(updater, "update", return_value="Verified without changes") as run, \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(updater.main(["--public", "--check"]), 0)
+        self.assertIsNone(run.call_args.args[0]._token)
+        self.assertTrue(run.call_args.kwargs["dry_run"])
+
+    def test_default_private_mode_still_requires_systemd_credential(self):
+        with mock.patch.object(updater.os, "getuid", return_value=1234), \
+                mock.patch.object(updater.os, "geteuid", return_value=1234), \
+                mock.patch.dict(os.environ, {}, clear=True), \
+                mock.patch.object(updater, "update", side_effect=AssertionError("No credential means no update")), \
+                contextlib.redirect_stderr(io.StringIO()) as output:
+            self.assertEqual(updater.main(["--check"]), 1)
+        self.assertIn("credential is unavailable", output.getvalue())
+
     def test_root_refused_before_credential_or_network_access(self):
         with mock.patch.object(updater.os, "getuid", return_value=0), \
                 mock.patch.object(updater, "read_token", side_effect=AssertionError("Must not read credentials")), \

@@ -1,13 +1,13 @@
 # Nexadly deployment and automatic updates
 
-A push to this private repository's `main` branch builds and checks the public website in GitHub Actions, then publishes a static release. A dedicated VPS service checks for the release every two minutes and changes only Nexadly's `current` pointer after verification. Adgrowly's files, containers, database and deployment configuration are outside the updater's writable paths.
+A push to this repository's `main` branch builds and checks the public website in GitHub Actions, then publishes a static release. A dedicated VPS service checks for the release every fifteen minutes in public mode (two minutes with a private-repository credential) and changes only Nexadly's `current` pointer after verification. Adgrowly's files, containers, database and deployment configuration are outside the updater's writable paths.
 
-**Prepared code is not proof that automation is running.** Activation needs the initial site/container, an owner-provisioned read credential, enabled timer and one observed release switch. No VPS or DNS changes are made by committing these files.
+**Prepared code is not proof that automation is running.** Activation needs the initial site/container, an explicitly selected public or private access mode, enabled timer and one observed release switch. Only private mode needs an owner-provisioned read credential. No VPS or DNS changes are made by committing these files.
 
 ## Boundaries
 
-- Repository remains private. The workflow uses its ephemeral `GITHUB_TOKEN` with `contents: write`; it has no SSH key or server credentials.
-- VPS token: a fine-grained personal access token for **Sidharthkumar2024/nexadly only**, **Contents: read** and the automatically included Metadata access. Choose an expiry, retain its renewal date, and grant no write/admin/workflow scope. The assistant does not create, retrieve or reuse broad credentials.
+- Repository visibility is an owner decision. Public mode requires the repository and release assets to be publicly readable. The workflow uses its ephemeral `GITHUB_TOKEN` with `contents: write`; it has no SSH key or server credentials.
+- Optional private-mode VPS token: a fine-grained personal access token for **Sidharthkumar2024/nexadly only**, **Contents: read** and the automatically included Metadata access. Choose an expiry, retain its renewal date, and grant no write/admin/workflow scope. The assistant does not create, retrieve or reuse broad credentials.
 - The fixed updater is installed root-owned under `/opt/nexadly/bin`; it runs as `nexadly-updater`, refuses root, and never fetches/executes deployment code. Only verified static HTML/CSS/JavaScript/images/fonts are downloaded. Client-side JavaScript remains website content; it is never executed as a server command.
 - The updater cannot use Docker or system-control sockets. Only `/opt/nexadly/www` and its own state directory are writable. It does not reload Caddy, stop applications, alter DNS, delete old releases or prune failed staging directories.
 - All normal pages use `https://nexadly.com` canonicals. The five unfinished legal policies remain factual, noindex review notices. Substantive legal drafts are excluded.
@@ -27,7 +27,7 @@ shasum -a 256 /private/tmp/nexadly-initial-release/nexadly-static.tar.gz /privat
 
 The output directory/helper must be new; existing artifacts are not overwritten. Use `/tmp` instead of `/private/tmp` on Linux. In a workspace that also serves the private Sites preview, run these commands in an isolated checkout so its private `dist/` is preserved.
 
-Transfer only the reviewed archive, pinned helper and deployment setup files through the owner's authenticated server session. Compare the local and server SHA-256 values. The pinned helper rechecks its exact archive and manifest, and exposes two explicit phases:
+Transfer only the reviewed archive, pinned helper and deployment setup files through the owner's authenticated server session. For a public repository, download release assets and setup files using an exact reviewed commit/tag URL, compare their expected SHA-256 values, and run the local bootstrap renderer before executing its output. Never execute a mutable main-branch download as root. Compare the local and server SHA-256 values. The pinned helper rechecks its exact archive and manifest, and exposes two explicit phases:
 
 ```sh
 sudo python3 /path/to/nexadly-bootstrap.py prepare /path/to/nexadly-static.tar.gz
@@ -45,13 +45,16 @@ Verify the existing Adgrowly site and Nexadly separately. DNS changes, certifica
 Prerequisites: Linux/systemd with `LoadCredential` support (systemd 247+), Python 3.9+, existing Docker setup, and the completed stable-mount bootstrap. Run the reviewed **local** setup files on the VPS; never pipe a downloaded installer directly to a root shell.
 
 ```sh
-sudo python3 /path/to/deploy/install_updater.py
-sudo python3 /path/to/deploy/provision_credential.py
+sudo python3 /path/to/deploy/install_updater.py --public
 ```
 
-The first command creates the non-login `nexadly-updater` account, installs the fixed updater and units, checks unit syntax and reloads systemd's unit definitions. It does **not** enable or start the timer. Existing release contents are untouched; only the dedicated `www`, `www/releases` and updater-state directory ownership is assigned to the new account. Differing existing installed scripts/units cause a stop for explicit upgrade review.
+The installer creates the non-login `nexadly-updater` account, installs the fixed updater and units, checks unit syntax and reloads systemd's unit definitions. It does **not** enable or start the timer. Existing release contents are untouched; only the dedicated `www`, `www/releases` and updater-state directory ownership is assigned to the new account. Differing existing installed scripts/units cause a stop for explicit upgrade review.
 
-The credential command prompts the owner without echo and saves `/etc/nexadly/github-token` root-owned mode `0600`. Enter the token only into that server prompt, never into a Git commit, chat, command argument or Actions secret. Its shape is checked locally; its actual repository permissions and expiry must be checked in GitHub settings. The service receives it through systemd `LoadCredential`; it is not an environment-variable value and is not logged. Existing credentials are never silently replaced.
+Public mode removes `LoadCredential` from the installed service, passes `--public` to the updater, and never reads or sends a token. It checks every fifteen minutes to leave headroom under GitHub's unauthenticated API allowance of 60 requests per hour per source IP. Each full verification uses about eight API requests; other software on the same server shares that allowance. Rate-limit failures retain the current website.
+
+For a private repository, omit `--public`, then run `sudo python3 /path/to/deploy/provision_credential.py`. This installs the two-minute credential-backed template. Changing an existing installation's mode requires an explicit reviewed upgrade; the installer never silently replaces differing installed units.
+
+The optional credential command prompts the owner without echo and saves `/etc/nexadly/github-token` root-owned mode `0600`. Enter the token only into that server prompt, never into a Git commit, chat, command argument or Actions secret. Its shape is checked locally; its actual repository permissions and expiry must be checked in GitHub settings. The service receives it through systemd `LoadCredential`; it is not an environment-variable value and is not logged. Existing credentials are never silently replaced.
 
 Before scheduling, confirm the workflow produced a published release for current main, then run and inspect one update:
 
@@ -64,15 +67,15 @@ sudo systemctl enable --now nexadly-updater.timer
 sudo systemctl list-timers nexadly-updater.timer --no-pager
 ```
 
-The updater follows the exact `nexadly-<current-main-SHA>` release and verifies the actual lightweight tag target, not just the latest release label. A missing, draft, incomplete, stale or malformed release leaves the current website unchanged. It repeats the main/tag checks just before the atomic pointer change. Asset downloads are bounded; authorization is stripped on redirects. Checksums are integrity checks under the authenticated repository publisher's trust, not an independent signing authority.
+The updater follows the exact `nexadly-<current-main-SHA>` release and verifies the actual lightweight tag target, not just the latest release label. A missing, draft, incomplete, stale or malformed release leaves the current website unchanged. It repeats the main/tag checks just before the atomic pointer change. Asset downloads are bounded; authorization is stripped on redirects. Checksums are integrity checks under the reviewed GitHub repository publisher's trust, not an independent signing authority.
 
-To verify without a pointer change, run the installed updater's `--check` mode under the same unprivileged systemd credential context. For example, create a one-time diagnostic service:
+To verify without a pointer change, run the installed updater's `--check` mode under the same unprivileged systemd access mode. For example, create a one-time diagnostic service:
 
 ```sh
-sudo systemd-run --wait --pipe --unit=nexadly-update-check --uid=nexadly-updater --gid=nexadly-updater --property=LoadCredential=github-token:/etc/nexadly/github-token /usr/bin/python3 -I -B /opt/nexadly/bin/updater.py --check
+sudo systemd-run --wait --pipe --unit=nexadly-update-check --uid=nexadly-updater --gid=nexadly-updater /usr/bin/python3 -I -B /opt/nexadly/bin/updater.py --public --check
 ```
 
-Use a new diagnostic unit name if that name already exists. `--check` does not create a lock file, download cache, release directory or pointer.
+For private mode, remove `--public` and add `--property=LoadCredential=github-token:/etc/nexadly/github-token` before the executable. Use a new diagnostic unit name if that name already exists. `--check` does not create a lock file, download cache, release directory or pointer.
 
 ## Release behavior and evidence
 
@@ -96,7 +99,7 @@ The updater validates files before switching but does not implement post-switch 
 
 No automatic pruning is implemented. Monitor storage; failed or superseded releases are retained. If a partial directory already exists for a commit, the updater refuses to repair/overwrite it automatically. Publish a new commit or have the owner review the retained directory.
 
-An expired/revoked/insufficient token causes update failure while the current site stays served. Rotate the credential through an owner-approved server edit, preserve mode `0600`, then start the one-shot service again. Changing the updater code, service hardening, publisher trust, domain or host is a separate reviewed installation step; website pushes never update the privileged bootstrap or installed updater itself.
+Making a public repository private requires switching the installed updater to private mode; until then, failed public lookups retain the current site. In private mode, an expired/revoked/insufficient token causes update failure while the current site stays served. Rotate the credential through an owner-approved server edit, preserve mode `0600`, then start the one-shot service again. Changing the updater code, service hardening, publisher trust, domain or host is a separate reviewed installation step; website pushes never update the privileged bootstrap or installed updater itself.
 
 ## References
 
@@ -104,3 +107,5 @@ An expired/revoked/insufficient token causes update failure while the current si
 - [GitHub Actions token permissions](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token)
 - [systemd credentials and execution restrictions](https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html)
 - [Caddy graceful configuration reload](https://caddyserver.com/docs/command-line#caddy-reload)
+
+- [GitHub REST API rate limits](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api)
