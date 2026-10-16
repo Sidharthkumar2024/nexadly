@@ -64,3 +64,7 @@ The custom Nexadly code-bracket N mark with a data node and Technology & AI word
 Source: https://github.com/Sidharthkumar2024/nexadly. Run `npm run build` to generate `dist/`; the generated directory is intentionally ignored in Git. The tracked `.openai/hosting.json` identifies the existing private Sites deployment and contains no access token.
 
 Platform service references to Meta Ads, Google Ads and OpenAI describe independent expertise. No official partnership badges, endorsements or fabricated customer testimonials are used. Official partnership claims require corresponding verification.
+
+## Ribbon logo
+
+The current brand uses the owner-supplied ribbon-logo reference recolored in olive and lime, with TM and the approved Technologies Private Limited subtitle. Built-in image generation produced the transparent PNG assets. The full logo includes the approved tagline; the header uses a compact variant on a light surface. The earlier SVG files remain available as prior artwork. No registered-trademark symbol is used. See `branding/ribbon-logo-prompts.md` for the final prompts.

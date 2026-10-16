@@ -65,7 +65,7 @@ export function renderSeo(path, page, config) {
   if (path === '/') {
     graph.push({
       '@type': 'Organization', '@id': organizationId, name: 'Nexadly', legalName: 'Nexadly Technologies Private Limited', url: `${origin}/`,
-      logo: absolute('/assets/nexadly-logo.svg', origin), email: 'hello@nexadly.com',
+      logo: absolute('/assets/nexadly-ribbon-logo.png', origin), email: 'hello@nexadly.com',
       description: 'Websites, Shopify stores, custom software, AI automation and digital growth services for businesses in Canada, the United States and beyond.',
       areaServed: marketCountries,
       contactPoint: { '@type': 'ContactPoint', contactType: 'Sales enquiries', email: 'hello@nexadly.com' },
