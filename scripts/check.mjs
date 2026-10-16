@@ -100,10 +100,10 @@ for(const file of files){
       const graph=data['@graph'];
       const page=graph.find(node=>['WebPage','AboutPage','ContactPage'].includes(node['@type']));
       if(page?.url!==canonical)errors.push(`${name}: structured page URL differs from canonical`);
-      if(/"(?:aggregateRating|review|legalName|taxID|address)"/.test(scripts[0][1]))errors.push(`${name}: unapproved company or review schema`);
+      if(/"(?:aggregateRating|review|taxID|address)"/.test(scripts[0][1]))errors.push(`${name}: unapproved company or review schema`);
       if(path==='/'){
         const org=graph.find(node=>node['@type']==='Organization');
-        if(org?.name!=='Nexadly'||org?.email!=='hello@nexadly.com')errors.push(`${name}: approved organization details missing`);
+        if(org?.name!=='Nexadly'||org?.legalName!=='Nexadly Technologies Private Limited'||org?.email!=='hello@nexadly.com')errors.push(`${name}: approved organization details missing`);
         if(org?.logo?.startsWith(config.origin+'/'))await localTarget(new URL(org.logo).pathname,path,name);
         if(!graph.some(node=>node['@type']==='WebSite'))errors.push(`${name}: WebSite schema missing`);
       }else{
