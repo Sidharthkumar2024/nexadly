@@ -57,4 +57,4 @@ Content references checked on 16 October 2026:
 
 ## Motion and accessibility
 
-The custom Nexadly ribbon mark is available in dark/light SVG variants and a matching favicon. Progressive scroll reveals, button/card interactions and supported cross-document transitions respect reduced-motion preferences. Core content remains visible with JavaScript disabled.
+The custom Nexadly code-bracket N mark with a data node and Technology & AI wordmark is available in dark/light SVG variants and a matching favicon. Progressive scroll reveals, button/card interactions and supported cross-document transitions respect reduced-motion preferences. Core content remains visible with JavaScript disabled.
