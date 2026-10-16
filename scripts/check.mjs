@@ -1,9 +1,13 @@
 import assert from 'node:assert/strict';
 import {readdir,readFile,stat} from 'node:fs/promises';
 import {resolve,join} from 'node:path';
+import {spawnSync} from 'node:child_process';
+import {services} from '../src/pages.mjs';
 import {createSiteConfig,renderSeo,renderSitemap,renderRobots} from '../src/seo.mjs';
 
-const root=resolve('dist');
+const review=process.argv.includes('--legal-review');
+const root=resolve(review?'review-dist':'dist');
+const policyPaths=['/privacy/','/terms/','/cookies/','/refund-cancellation/','/data-deletion/'];
 const config=createSiteConfig();
 const errors=[];
 const titles=new Map();
@@ -73,12 +77,15 @@ for(const file of files){
   const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]);
   if(ids.length!==new Set(ids).size)errors.push(`${name}: duplicate IDs`);
   if(/swiftupi\.ca/.test(html))errors.push(`${name}: incorrect SwiftUPI domain`);
+  if(!review&&html.includes('data-legal-review="true"'))errors.push(`${name}: legal draft leaked into publication output`);
+  if(/(?:company registered in|registered company in|our business is registered|is registered in India)/i.test(html))errors.push(`${name}: unverified incorporation claim`);
+  if(/₹|\bINR\b|\bCAD\b/.test(html))errors.push(`${name}: non-USD corporate pricing`);
   unique(decode(html.match(/<title>([^<]+)<\/title>/)?.[1]),titles,name,'title');
   unique(meta(html,'description'),descriptions,name,'description');
   const canonicals=[...html.matchAll(/<link rel="canonical" href="([^"]+)"/g)].map(x=>decode(x[1]));
   if(canonicals.length!==1||canonicals[0]!==canonical)errors.push(`${name}: canonical does not match configured origin and route`);
   const robots=meta(html,'robots');
-  if(!config.publicIndexing||path==='/404/'){
+  if(!config.publicIndexing||path==='/404/'||policyPaths.includes(path)){
     if(robots!=='noindex,nofollow')errors.push(`${name}: private preview or 404 must remain noindex`);
   }else if(!robots.startsWith('index,follow'))errors.push(`${name}: public page indexing metadata missing`);
   if(meta(html,'og:url')!==canonical)errors.push(`${name}: Open Graph URL differs from canonical`);
@@ -92,7 +99,7 @@ for(const file of files){
 
   const scripts=[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
   if(path!=='/404/'){
-    canonicalUrls.push(canonical);
+    if(!policyPaths.includes(path))canonicalUrls.push(canonical);
     if(scripts.length!==1)errors.push(`${name}: expected one structured-data graph`);
     else try{
       const data=JSON.parse(scripts[0][1]);
@@ -100,10 +107,10 @@ for(const file of files){
       const graph=data['@graph'];
       const page=graph.find(node=>['WebPage','AboutPage','ContactPage'].includes(node['@type']));
       if(page?.url!==canonical)errors.push(`${name}: structured page URL differs from canonical`);
-      if(/"(?:aggregateRating|review|taxID|address)"/.test(scripts[0][1]))errors.push(`${name}: unapproved company or review schema`);
+      if(/"(?:aggregateRating|review|legalName|taxID|address)"/.test(scripts[0][1]))errors.push(`${name}: unapproved company or review schema`);
       if(path==='/'){
         const org=graph.find(node=>node['@type']==='Organization');
-        if(org?.name!=='Nexadly'||org?.legalName!=='Nexadly Technologies Private Limited'||org?.email!=='hello@nexadly.com')errors.push(`${name}: approved organization details missing`);
+        if(org?.name!=='Nexadly'||org?.email!=='hello@nexadly.com')errors.push(`${name}: approved organization details missing`);
         if(org?.logo?.startsWith(config.origin+'/'))await localTarget(new URL(org.logo).pathname,path,name);
         if(!graph.some(node=>node['@type']==='WebSite'))errors.push(`${name}: WebSite schema missing`);
       }else{
@@ -130,7 +137,27 @@ for(const name of ['callvani','adgrowly','swiftupi','chair-manage']){
   const html=await readFile(join(root,'products',name,'index.html'),'utf8');
   if(!html.includes('target="_blank" rel="noopener noreferrer"'))errors.push(`${name}: official site link missing`);
 }
-await stat(join(root,'services/shopify-development/index.html')).catch(()=>errors.push('Shopify service page missing'));
+const requiredServices=['Website Development','Mobile App Development','Custom Software Development','SaaS Development','AI Automation','AI Calling Solutions','WhatsApp Business Automation','Google Ads Management','Meta Ads Management','Jio Advertising Solutions','ChatGPT Advertising Solutions','Search Engine Optimization','Social Media Marketing','Branding and Graphic Design','Cloud Hosting and Server Management','API Integrations','E-commerce Development','CRM and ERP Development'];
+for(const service of requiredServices)if(!services.some(item=>item.name===service))errors.push(`Required service missing: ${service}`);
+const homeHtml=await readFile(join(root,'index.html'),'utf8');
+for(const {slug}of services){
+  await stat(join(root,'services',slug,'index.html')).catch(()=>errors.push(`Service page missing: ${slug}`));
+  const footer=homeHtml.match(/<nav class="footer-service-directory"[\s\S]*?<\/nav>/)?.[0]||'';
+  if(!footer.includes(`/services/${slug}/`))errors.push(`Service directory missing: ${slug}`);
+}
+for(const path of policyPaths){
+  const html=await readFile(join(root,path,'index.html'),'utf8');
+  const marker=review?'data-legal-review="true"':'data-policy-status="review-pending"';
+  if(!html.includes(marker))errors.push(`${path}: missing legal review boundary`);
+  if(!homeHtml.includes(`href="${path}"`))errors.push(`${path}: missing footer policy link`);
+  if(!html.includes('mailto:hello@nexadly.com'))errors.push(`${path}: policy contact missing`);
+}
+const hosting=JSON.parse(await readFile('.openai/hosting.json','utf8'));
+assert.equal(hosting.static.directory,'dist','Publishing must exclude review-dist');
+const rejectedReview=spawnSync(process.execPath,['build.mjs','--legal-review'],{encoding:'utf8',env:{...process.env,SITE_INDEXING:'public',SITE_ORIGIN:'https://nexadly.com'}});
+assert.notEqual(rejectedReview.status,0,'Public legal review builds must be rejected');
+assert.match(rejectedReview.stderr,/Legal review drafts cannot be built with public indexing/);
+
 const robots=await readFile(join(root,'robots.txt'),'utf8');
 if(robots!==renderRobots(config))errors.push('robots.txt differs from the configured indexing mode');
 const sitemap=await readFile(join(root,'sitemap.xml'),'utf8');
@@ -139,4 +166,4 @@ const expectedUrls=config.publicIndexing?canonicalUrls:[];
 if(JSON.stringify([...new Set(sitemapUrls)].sort())!==JSON.stringify(expectedUrls.sort())||sitemapUrls.length!==new Set(sitemapUrls).size)errors.push('Sitemap must contain every indexable canonical exactly once and no private/404 pages');
 
 if(errors.length){console.error([...new Set(errors)].join('\n'));process.exit(1);}
-console.log(`PASS: ${files.length} HTML pages; ${checked} internal links/assets; page structure, unique metadata, structured data, breadcrumbs and ${config.publicIndexing?'public':'private'} indexing verified.`);
+console.log(`PASS: ${files.length} HTML pages; ${checked} internal links/assets; service directory, legal draft separation, unique metadata, structured data, breadcrumbs and ${config.publicIndexing?'public':'private'} indexing verified.`);

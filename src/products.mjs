@@ -22,7 +22,7 @@ export const products = [
   { slug: 'callvani', name: 'CallVani', category: 'AI voice & conversations', summary: 'Natural conversations. Thoughtful follow-ups. One connected calling workspace.', domain: 'https://callvani.com', color: '#e5ecb5' },
   { slug: 'adgrowly', name: 'Adgrowly', category: 'Local visibility & growth', summary: 'Bring your Google Business Profiles, content and customer reviews into focus.', domain: 'https://adgrowly.ca', color: '#dcf0db' },
   { slug: 'swiftupi', name: 'SwiftUPI', category: 'UPI links & collection management', summary: 'Bring payment links, order-specific UPI QR requests and collection records into one organised workflow.', domain: 'https://swiftupi.com', color: '#c9e9e7' },
-  { slug: 'chair-manage', name: 'Chair Manage', category: 'Salon & beauty operations', summary: 'A more organised salon day, from the first appointment to the final checkout.', domain: 'https://chairmanage.com', color: '#e6dcf4' },
+  { slug: 'chair-manage', name: 'ChairManage', category: 'Salon & beauty operations', summary: 'A more organised salon day, from the first appointment to the final checkout.', domain: 'https://chairmanage.com', color: '#e6dcf4' },
 ];
 
 const details = {
@@ -123,7 +123,7 @@ const details = {
   },
   'chair-manage': {
     headline: 'Good hair days.\nBetter business days.',
-    description: 'Keep appointments, people and daily operations in sync. Chair Manage brings salon management and customer engagement together so you can focus on the experience in every chair.',
+    description: 'Keep appointments, people and daily operations in sync. ChairManage brings salon management and customer engagement together so you can focus on the experience in every chair.',
     intro: 'Smarter salon management. Better customer experiences.',
     introText: 'From a customer’s first booking to their next visit, bring the details of your salon day into one organised view. Designed for salons, beauty businesses and growing teams.',
     featureHeading: 'Every detail of\na well-run salon.',
@@ -146,10 +146,10 @@ const details = {
     uses: [['Hair salons', 'Keep bookings and customer history organised.'], ['Beauty salons', 'Coordinate services and customer relationships.'], ['Nail studios', 'Bring appointments and repeat visits together.'], ['Spas', 'Manage service packages and memberships.'], ['Grooming studios', 'Support everyday bookings and checkout.'], ['Salon chains', 'Review operations across multiple branches.']],
     note: 'Discuss your branch, messaging and operational requirements during a demo. WhatsApp workflows require customer consent and the applicable platform setup.',
     faqs: [
-      ['Who is Chair Manage designed for?', 'Chair Manage is designed for hair salons, beauty salons, nail studios, spas, grooming studios and salon chains.'],
+      ['Who is ChairManage designed for?', 'ChairManage is designed for hair salons, beauty salons, nail studios, spas, grooming studios and salon chains.'],
       ['Does the product cover staff and customer management?', 'The approved product scope includes customer management, visit history, staff management, attendance, payroll and staff performance reporting.'],
       ['Which customer engagement tools are included?', 'The product specification includes membership plans, loyalty rewards, digital stamp cards, coupons, WhatsApp reminders and marketing automation. Confirm your required setup during a product walkthrough.'],
-      ['Where can I confirm pricing and availability?', 'Visit the official Chair Manage website or request a demo. We will help you confirm the current offering for your salon and branches.'],
+      ['Where can I confirm pricing and availability?', 'Visit the official ChairManage website or request a demo. We will help you confirm the current offering for your salon and branches.'],
     ],
   },
 };
@@ -182,7 +182,9 @@ const faqSection = (p, faqs) => `<section class="section px-faq"><div class="con
 
 const moreProducts = (p) => `<section class="section px-more"><div class="container"><div class="px-section-top"><div><p class="eyebrow">More from Nexadly</p><h2>Good tools. Greater possibilities.</h2></div><a href="/products/" class="text-link">Explore all products ${arrow}</a></div><div class="px-related-grid">${products.filter(item => item.slug !== p.slug).map(item => `<a class="px-related-card" href="/products/${item.slug}/">${brandMark(item.slug)}<h3>${item.name} <span>↗</span></h3><p>${item.summary}</p><span class="px-related-category">${item.category}</span></a>`).join('')}</div></div></section>`;
 
-const ctaSection = (p, title = 'See what’s possible<br> for your business.') => `<section class="px-cta"><div class="container"><div><p class="eyebrow">Your next step starts here</p><h2>${title}</h2><p>Explore ${p.name} or talk to us about the way your business works.</p></div><div class="px-cta-actions">${external(p)}<a class="button px-button-outline" href="/contact/?product=${p.slug}">Request a demo ${arrow}</a></div></div></section>`;
+const ctaSection = (p, title = 'See what’s possible<br> for your business.') => `<section class="px-cta"><div class="container"><div><p class="eyebrow">Your next step starts here</p><h2>${title}</h2><p>Visit the official ${p.name} website for product plans, account access, support and policies. For custom implementation, speak to Nexadly about a separate project scope.</p></div><div class="px-cta-actions">${external(p)}<a class="button px-button-outline" href="/contact/?product=${p.slug}">Request a demo ${arrow}</a></div></div></section>`;
+
+const productBoundary = (p) => `<aside class="nx-product-boundary" aria-label="Product account and corporate service information"><div class="container"><div><p class="eyebrow">YOUR PRODUCT WORKSPACE</p><h2>${p.name} has its own home.</h2><p>Use <a href="${p.domain}" target="_blank" rel="noopener noreferrer">${new URL(p.domain).hostname}<span class="nx-visually-hidden"> (opens in a new tab)</span></a> for product accounts, current plans, support and product-specific policies. Nexadly corporate services are quoted separately and do not automatically include a ${p.name} subscription.</p></div><a class="text-link" href="/services/">Need custom implementation? ${arrow}</a></div></aside>`;
 
 export function renderProduct(slug) {
   const p = products.find((item) => item.slug === slug);
@@ -191,6 +193,6 @@ export function renderProduct(slug) {
   return {
     title: `${p.name} — ${p.category}`,
     description: d.description,
-    body: `<div class="px-page px-page-${slug}"><section class="px-hero"><div class="container"><nav class="px-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/products/">Products</a><span>/</span><span>${p.name}</span></nav><div class="px-hero-grid"><div class="px-hero-copy"><div class="px-product-label">${brandMark(slug)}<span>${p.name}<small>${p.category}</small></span></div><h1>${d.headline.replace('\n', '<br> ')}</h1><p class="lead">${d.description}</p><div class="px-hero-actions">${external(p)}<a class="button px-button-outline" href="/contact/?product=${slug}">Request a demo ${arrow}</a></div><p class="px-hero-footnote">A Nexadly product. Built around real business needs.</p></div>${productVisual(slug)}</div></div></section><section class="section px-intro"><div class="container"><p class="eyebrow">Meet ${p.name}</p><h2>${d.intro}</h2><p>${d.introText}</p></div></section>${featureSection(d)}${workflowSection(d, slug)}<section class="section px-use-cases"><div class="container"><p class="eyebrow">Made for your kind of work</p><h2>${d.useTitle}</h2><div class="px-use-grid">${d.uses.map(([title, text], i) => `<article><span>0${i + 1}</span><h3>${title}</h3><p>${text}</p></article>`).join('')}</div><div class="px-product-note"><span aria-hidden="true">i</span><p>${d.note}</p></div></div></section>${faqSection(p, d.faqs)}${ctaSection(p)}${moreProducts(p)}</div>`,
+    body: `<div class="px-page px-page-${slug}"><section class="px-hero"><div class="container"><nav class="px-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/products/">Products</a><span>/</span><span>${p.name}</span></nav><div class="px-hero-grid"><div class="px-hero-copy"><div class="px-product-label">${brandMark(slug)}<span>${p.name}<small>${p.category}</small></span></div><h1>${d.headline.replace('\n', '<br> ')}</h1><p class="lead">${d.description}</p><div class="px-hero-actions">${external(p)}<a class="button px-button-outline" href="/contact/?product=${slug}">Request a demo ${arrow}</a></div><p class="px-hero-footnote">A separate SaaS product in the Nexadly product family.</p></div>${productVisual(slug)}</div></div></section>${productBoundary(p)}<section class="section px-intro"><div class="container"><p class="eyebrow">Meet ${p.name}</p><h2>${d.intro}</h2><p>${d.introText}</p></div></section>${featureSection(d)}${workflowSection(d, slug)}<section class="section px-use-cases"><div class="container"><p class="eyebrow">Made for your kind of work</p><h2>${d.useTitle}</h2><div class="px-use-grid">${d.uses.map(([title, text], i) => `<article><span>0${i + 1}</span><h3>${title}</h3><p>${text}</p></article>`).join('')}</div><div class="px-product-note"><span aria-hidden="true">i</span><p>${d.note}</p></div></div></section>${faqSection(p, d.faqs)}${ctaSection(p)}${moreProducts(p)}</div>`,
   };
 }

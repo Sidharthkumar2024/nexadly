@@ -36,3 +36,21 @@
 @media(max-width:680px){.nx-legal .nx-legal-hero{padding-top:130px;padding-bottom:44px}.nx-legal .nx-legal-hero h1{margin-top:20px;font-size:clamp(2.65rem,10.8vw,4.3rem)}.nx-legal .nx-legal-summary{grid-template-columns:1fr;gap:28px;padding-top:32px;padding-bottom:32px}.nx-legal .nx-legal-layout{grid-template-columns:1fr;gap:40px;padding-top:40px;padding-bottom:48px}.nx-legal .nx-legal-sidebar{position:static;padding:24px;background:#f2f4ed;border-radius:16px}.nx-legal .nx-legal-sidebar ol{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px}.nx-legal .nx-legal-help{margin-top:24px;padding-top:20px}.nx-legal .nx-legal-section{gap:12px;grid-template-columns:28px minmax(0,1fr);margin-bottom:30px;padding-bottom:30px}.nx-legal .nx-legal-section p{font-size:.93rem;line-height:1.75}.nx-legal .nx-legal-contact{flex-direction:column;align-items:flex-start;padding:28px;margin-bottom:60px}.nx-legal .nx-legal-meta{gap:12px 24px}}
 @media(max-width:390px){.nx-legal .nx-legal-sidebar ol{grid-template-columns:1fr}.nx-legal .nx-legal-section{grid-template-columns:1fr;gap:8px}}
 @media print{.nx-legal .nx-legal-sidebar,.nx-legal .nx-legal-contact{display:none}.nx-legal .nx-legal-hero{padding-top:24px}.nx-legal .nx-legal-layout{display:block;padding-top:32px}.nx-legal .nx-legal-section{break-inside:avoid}.nx-legal .nx-legal-section p{color:#222}.nx-legal .nx-legal-hero h1{font-size:42px}}
+
+/* Policy status is visible in both screen and print output. */
+.nx-legal .nx-legal-draft-banner{max-width:840px;margin:0 0 28px;padding:22px 26px;border:1px solid #afb99b;border-left:5px solid #566b2d;border-radius:4px 14px 14px 4px;background:#eef1e6}
+.nx-legal .nx-legal-draft-banner strong{display:block;font-size:1.05rem;color:#263416}
+.nx-legal .nx-legal-draft-banner p{margin:8px 0 0;line-height:1.7;color:#505d40;font-size:.94rem}
+.nx-legal .nx-legal-review-point{margin-top:20px;padding:20px 24px;background:#f4f1e8;border-left:3px solid #85764e;border-radius:0 10px 10px 0}
+.nx-legal .nx-legal-review-point>strong{display:block;margin-bottom:8px;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:#65542a}
+.nx-legal .nx-legal-review-point p{margin:0;font-size:.9rem;color:#625a44}
+.nx-legal .nx-legal-holding-content{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(250px,1fr);gap:80px;padding-bottom:100px}
+.nx-legal .nx-legal-holding-content h2{font-size:clamp(1.5rem,2.4vw,2.2rem);line-height:1.2;letter-spacing:-.04em;margin:0 0 22px;font-weight:500}
+.nx-legal .nx-legal-holding-content h2:not(:first-child){margin-top:38px}
+.nx-legal .nx-legal-holding-content p{max-width:760px;font-size:1rem;line-height:1.8;color:var(--legal-muted);margin:0 0 18px}
+.nx-legal .nx-legal-holding-content a:not(.button){color:var(--legal-ink);text-underline-offset:4px;overflow-wrap:anywhere}
+.nx-legal .nx-legal-holding-contact{align-self:start;padding:32px;background:#edf1e4;border-radius:20px}
+.nx-legal .nx-legal-holding-contact .eyebrow{font-size:.65rem}
+.nx-legal .nx-legal-holding-contact .button{margin-top:28px;width:fit-content}
+@media(max-width:800px){.nx-legal .nx-legal-holding-content{grid-template-columns:1fr;gap:35px;padding-bottom:60px}.nx-legal .nx-legal-draft-banner{padding:20px}.nx-legal .nx-legal-holding-contact{padding:26px}}
+@media print{.nx-legal .nx-legal-draft-banner,.nx-legal .nx-legal-review-point{break-inside:avoid;border:1px solid #555;background:none}.nx-legal .nx-legal-holding-content{display:block}.nx-legal .nx-legal-holding-contact{display:none}}

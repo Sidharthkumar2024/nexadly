@@ -1,70 +1,68 @@
 # Nexadly corporate website
 
-A standalone, dependency-free, statically generated marketing site. The existing salon application in the parent checkout is not modified.
+A standalone, dependency-free static website for Nexadly's technology, marketing and automation services. This nested repository does not modify the parent salon application.
 
-## Run locally
+## Run and check
 
 ```sh
 npm run dev
+npm run check
 ```
 
-Open http://localhost:4377. Run `npm run build` after changes; `npm run check` checks built page structure, internal links and local assets. Production files are in `dist/`.
+The regular preview runs at http://localhost:4377. Rebuild after source changes. `dist/` is the only publication directory.
 
-## Content and scope
+## Legal review drafts
 
-- Homepage and complete services, solutions, industries, pricing, company and resources pages.
-- Four dedicated product pages: CallVani, Adgrowly, SwiftUPI and Chair Manage.
-- Latest approved SwiftUPI domain: **https://swiftupi.com**. Product details are based on the public official website; payment verification depends on the configured source. No pricing or regulated-payment guarantees are asserted.
-- Chair Manage capabilities come from the user-supplied approved specification.
-- CallVani and Adgrowly reference their official websites and the supplied specification. Illustrative product UI is explicitly labelled and is not presented as production usage or customer results.
-- Public website branding uses Nexadly; the project agreement identifies the contracting party. The owner supplied Nexadly Technologies Private Limited as the Indian registered company name and states that the business is registered in Canada under Adgrowly. The exact Canadian legal entity name, registration identifiers and addresses have not been supplied. These are owner-provided details; no independent registry verification is implied.
-- Project pricing is presented in US dollars (USD). No fixed USD amount or package inclusions are inferred; the written proposal confirms the price, scope and additional costs. Shopify has a separate service page, without an assumed fixed package price.
-- The owner stated that Nexadly has worked with 100+ clients and primarily serves Canada and the United States. No client names, logos, testimonials, ratings, results or affiliations are fabricated.
-- All 19 service pages include tailored deliverables, a delivery process, FAQs and enquiry links. Terms and Privacy pages reflect the current static-site behavior; legal operator/contact address and actual mailbox retention/hosting arrangements still need confirmation before public launch.
+```sh
+npm run review
+npm run check:review
+npm run dev:review
+```
 
-## Contact behavior
+The local review site runs at http://localhost:4378 and uses `review-dist/`, which is ignored by Git and excluded from the hosting manifest. Its five policy pages have a prominent draft notice and unresolved review decisions. Corresponding Markdown drafts are in `legal-drafts/` for owner and legal review. They are not effective policies.
 
-The approved enquiry address is **hello@nexadly.com**. The consultation form prepares a `mailto:` enquiry for the visitor to review and send from their own email application. A local `.txt` download is provided as a fallback. The site does not claim to deliver mail itself, and it does not store form data or send form data to a server. SMTP/API delivery would require a separate verified provider integration.
+The ordinary build publishes only factual policy-status/contact pages at `/privacy/`, `/terms/`, `/cookies/`, `/refund-cancellation/` and `/data-deletion/`. These pages are noindex even when other pages are configured for public indexing. No draft terms, invented refund windows, deletion SLAs or unverified legal claims are included in the deployment artifact. A public-indexing build of the review site is explicitly rejected.
 
-The WhatsApp button is conditional on `NEXADLY_WHATSAPP_NUMBER`, an owner-approved international business number. Leave it unset until the owner provides the number; no placeholder or unrelated destination is shown.
+## Company and content facts
 
-## Publication
+- Owner-provided company name: **Nexadly Technologies Private Limited**. The incorporation certificate has not been supplied or checked. No registration/incorporation claim, registry number, address or Canadian entity relationship is asserted. Organization structured data deliberately omits `legalName` until certificate verification.
+- Positioning: **Technology, Marketing & Automation for Growth.**
+- All 18 requested services have dedicated pages. Existing Shopify, Digital Marketing and UI/UX pages are retained, making 21 service pages. Each includes scoped capabilities, process, deliverables, FAQs and enquiry links.
+- Corporate services are scoped through separate project proposals. Product subscriptions, accounts, support and policies belong to the relevant SaaS product; an implementation quote does not automatically include a subscription.
+- Product domains: CallVani https://callvani.com, Adgrowly https://adgrowly.ca, ChairManage https://chairmanage.com and SwiftUPI https://swiftupi.com. Product detail slugs remain stable, including `/products/chair-manage/`.
+- ChairManage feature content comes from the original user-supplied specification. SwiftUPI content retains previously sourced official product information; its site could not be fetched during the current update. No new features, regulated-payment claims or product prices are inferred.
+- Corporate quotations use **USD**. No fixed amount has been approved in USD; pricing remains a custom project quote.
+- The owner supplied the 100+ clients and Canada/US market statements. No customer quotations, partner badges, certifications, performance results or ratings are fabricated. Platform references describe services, not official endorsements.
 
-This project is registered as an owner-private Sites website. The `.openai/hosting.json` file stores that Site identity, with `dist` as the static directory. Preview pages deliberately use `noindex,nofollow`; robots.txt disallows crawling. The default canonical origin is the private Site URL. Before a public Nexadly launch, confirm the custom domain, indexing settings, company details and current product availability. An approved public launch requires both `SITE_INDEXING=public` and an explicit HTTPS `SITE_ORIGIN` outside the preview hostname. The default private sitemap is intentionally empty. Canonical, social metadata, visible breadcrumbs and structured Organization/WebSite/WebPage/Service data are generated centrally in `src/seo.mjs`.
+## Contact and data flow
+
+The approved enquiry email is **hello@nexadly.com**. The form builds a local `mailto:` draft for the visitor to review and send. A local `.txt` download is also available. Neither action submits form data to a Nexadly backend, and the site does not claim delivery. No custom analytics, advertising pixels or browser storage are implemented in the application code. External Google Fonts and the Sites hosting/access layer have their own processing.
+
+WhatsApp is conditional on `NEXADLY_WHATSAPP_NUMBER`, an owner-approved international business number. The number is still missing; no placeholder link is published.
+
+## Hosting and SEO
+
+The existing Sites project remains owner-private and publishes only `dist/`. Default canonical URLs use the actual private preview origin, metadata is `noindex,nofollow`, robots disallows crawling, and its sitemap is intentionally empty. Titles, descriptions, social metadata, breadcrumbs and Organization/WebSite/WebPage/Service structured data are generated centrally.
+
+The requested production domain is **https://nexadly.com**. It currently serves a different site. The accessible Vercel project named `nexadly` currently lists only `nexadly.vercel.app`; no custom-domain connection has been established by this update. Domain ownership, hosting destination and legal review must be resolved before a public launch. Do not equate the Sites preview with a deployment to nexadly.com.
+
+After that launch is approved and routed, set `SITE_ORIGIN=https://nexadly.com` and `SITE_INDEXING=public` for the appropriate production build. This enables public sitemap and robots output for normal content while the unapproved policy-status pages remain noindex. Do not change the hosting manifest to `review-dist`.
 
 ## Design and assets
 
-Design reference: https://upmind-temlis.webflow.io/home/home-v1. Original implementation follows the reference's editorial rhythm, full-bleed hero, olive/lime palette, pill buttons, airy typography and generous sections. Original SVG/CSS product visuals and Nexadly brand mark are authored for this project.
+Preserve the approved olive/lime ribbon logo, TM, company subtitle and original brand tagline. The logo PNG files in `public/assets/` were generated from the user's reference with the built-in image generation tool; prompts are retained in `branding/ribbon-logo-prompts.md`. Earlier SVG artwork is retained as history but is not the active site branding.
 
-`public/assets/nexadly-hero.png` is an original AI-generated image created with the built-in image generation tool. Its exact prompt is retained in `public/assets/hero-prompt.txt`. It is decorative art, not a company office or product screenshot. Fonts use Google Fonts (DM Sans and IBM Plex Mono), with local system fallbacks.
-
-Content references checked on 16 October 2026:
-
-- User-supplied Nexadly master brief.
-- https://callvani.com
-- https://adgrowly.ca
-- https://swiftupi.com
+The original glass hero image and labelled product concepts are illustrative, not office photographs, client work or live product data. Motion includes scroll reveals, hover transitions and reduced-motion support. Navigation, forms and product links support keyboard interaction; review desktop and mobile layouts after structural changes.
 
 ## Source layout
 
-- `src/home.mjs`: home and product overview pages.
-- `src/shell.mjs`: navigation, metadata and footer.
-- `src/products.mjs`: product content and original visual components.
-- `src/pages.mjs`: services, industries, company, guides and contact.
-- `public/`: CSS, interaction script and original assets.
-- `build.mjs`: static generation, sitemap and private-preview indexing settings.
-- `serve.mjs`: loopback-only development server with proper 404 handling.
-
-## Motion and accessibility
-
-The custom Nexadly code-bracket N mark with a data node and Technology & AI wordmark is available in dark/light SVG variants and a matching favicon. Progressive scroll reveals, button/card interactions and supported cross-document transitions respect reduced-motion preferences. Core content remains visible with JavaScript disabled.
-
-## Source repository
-
-Source: https://github.com/Sidharthkumar2024/nexadly. Run `npm run build` to generate `dist/`; the generated directory is intentionally ignored in Git. The tracked `.openai/hosting.json` identifies the existing private Sites deployment and contains no access token.
-
-Platform service references to Meta Ads, Google Ads and OpenAI describe independent expertise. No official partnership badges, endorsements or fabricated customer testimonials are used. Official partnership claims require corresponding verification.
-
-## Ribbon logo
-
-The current brand uses the owner-supplied ribbon-logo reference recolored in olive and lime, with TM and the approved Technologies Private Limited subtitle. Built-in image generation produced the transparent PNG assets. The full logo includes the approved tagline; the header uses a compact variant on a light surface. The earlier SVG files remain available as prior artwork. No registered-trademark symbol is used. See `branding/ribbon-logo-prompts.md` for the final prompts.
+- `src/home.mjs`: home and product overview.
+- `src/pages.mjs`: service catalog, About, Solutions, industries, pricing and contact.
+- `src/products.mjs`: product content and illustrative interfaces.
+- `src/legal.mjs`: safe policy notices and separate review draft renderers.
+- `legal-drafts/`: substantive Markdown drafts and review evidence.
+- `src/shell.mjs`: shared navigation and complete service/product/legal footer.
+- `src/seo.mjs`: canonical and search metadata.
+- `public/`: deployed assets, styles and browser interaction code.
+- `build.mjs`: publication/review output isolation.
+- `scripts/check.mjs`: route, link, metadata, claim and draft-isolation checks.

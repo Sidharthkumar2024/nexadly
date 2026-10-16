@@ -5,6 +5,9 @@
   "scripts": {
     "build": "node build.mjs",
     "dev": "node build.mjs && node serve.mjs",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "review": "node build.mjs --legal-review",
+    "check:review": "node scripts/check.mjs --legal-review",
+    "dev:review": "node build.mjs --legal-review && node serve.mjs --legal-review"
   }
 }

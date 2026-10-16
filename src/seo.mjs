@@ -1,14 +1,15 @@
 import {escape} from './ui.mjs';
 
+export const PRODUCTION_ORIGIN = 'https://nexadly.com';
 export const PREVIEW_ORIGIN = 'https://nexadly-digital.sidharthkumar2028.chatgpt.site';
 const marketCountries = [{ '@type': 'Country', name: 'Canada' }, { '@type': 'Country', name: 'United States' }];
 const sectionNames = {
   services: 'Services', products: 'Products', solutions: 'Solutions', industries: 'Industries',
   pricing: 'Pricing', about: 'About Nexadly', resources: 'Resources', contact: 'Contact',
-  privacy: 'Privacy Policy', terms: 'Terms of Use', 'privacy-policy': 'Privacy Policy',
+  privacy: 'Privacy Policy', terms: 'Terms and Conditions', cookies: 'Cookie Policy', 'refund-cancellation': 'Refund and Cancellation Policy', 'data-deletion': 'Data Deletion Policy', 'privacy-policy': 'Privacy Policy',
   'terms-and-conditions': 'Terms and Conditions', 'terms-of-service': 'Terms of Service',
 };
-const productNames = { callvani: 'CallVani', adgrowly: 'Adgrowly', swiftupi: 'SwiftUPI', 'chair-manage': 'Chair Manage' };
+const productNames = { callvani: 'CallVani', adgrowly: 'Adgrowly', swiftupi: 'SwiftUPI', 'chair-manage': 'ChairManage' };
 const cleanText = (value = '') => String(value).replace(/\s+/g, ' ').trim();
 const shortTitle = (page) => cleanText(page.seo?.name || page.title?.split(/\s[|—]\s/)[0]);
 const absolute = (path, origin) => new URL(path, `${origin}/`).href;
@@ -64,9 +65,9 @@ export function renderSeo(path, page, config) {
 
   if (path === '/') {
     graph.push({
-      '@type': 'Organization', '@id': organizationId, name: 'Nexadly', legalName: 'Nexadly Technologies Private Limited', url: `${origin}/`,
+      '@type': 'Organization', '@id': organizationId, name: 'Nexadly', url: `${origin}/`,
       logo: absolute('/assets/nexadly-ribbon-logo.png', origin), email: 'hello@nexadly.com',
-      description: 'Websites, Shopify stores, custom software, AI automation and digital growth services for businesses in Canada, the United States and beyond.',
+      description: 'Technology, marketing and automation for growth. Website, software, AI, integration and digital marketing services for businesses in Canada, the United States and beyond.',
       areaServed: marketCountries,
       contactPoint: { '@type': 'ContactPoint', contactType: 'Sales enquiries', email: 'hello@nexadly.com' },
     });

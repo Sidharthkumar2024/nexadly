@@ -1,0 +1,19 @@
+.footer-brand .footer-positioning{font-size:16px;line-height:1.6;margin:15px 0}
+.footer-brand .footer-company{font-size:12px;line-height:1.6;margin:0 0 18px;max-width:280px}
+.footer-product{margin-bottom:16px}
+.footer-product>a{display:block;font-size:14px;line-height:1.5;color:#26371c}
+.footer-product .footer-product-domain{display:flex;gap:7px;align-items:center;font-size:11px;color:#536344;margin-top:3px}
+.footer-product-domain svg{width:12px;height:12px}
+.footer-product>a:hover{text-decoration:underline;text-underline-offset:3px}
+.footer-contact-note{font-size:12px;line-height:1.7;color:#536344;max-width:225px;margin-top:20px}
+.footer-service-directory{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:26px 0;margin-bottom:26px}
+.footer-service-directory h3{font:10px var(--mono);letter-spacing:1px;color:#536344;margin:0 0 19px}
+.footer-service-directory>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 25px}
+.footer-service-directory a{font-size:12px;line-height:1.7;color:#39482e}
+.footer-service-directory a:hover{text-decoration:underline;text-underline-offset:3px}
+.footer-legal{flex-wrap:wrap;gap:15px 26px}
+.site-footer a:focus-visible{outline:2px solid #536d30;outline-offset:5px;border-radius:2px}
+.site-header a:focus-visible,.site-header button:focus-visible{outline:2px solid currentColor;outline-offset:4px;border-radius:3px}
+@media(min-width:1001px){.dropdown-panel{max-height:calc(100svh - 100px);overflow-y:auto}}
+@media(max-width:700px){.footer-service-directory>div{grid-template-columns:1fr 1fr;gap:12px 20px}.footer-service-directory a{font-size:11px}.footer-legal{gap:14px 20px}.footer-contact-note{max-width:none}}
+@media(max-width:380px){.footer-service-directory>div{grid-template-columns:1fr}.footer-top{gap:32px 16px}.footer-top>div:last-child{grid-column:1/-1}}
