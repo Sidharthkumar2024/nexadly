@@ -14,7 +14,7 @@ Open http://localhost:4377. Run `npm run build` after changes; `npm run check` c
 
 - Homepage and complete services, solutions, industries, pricing, company and resources pages.
 - Four dedicated product pages: CallVani, Adgrowly, SwiftUPI and Chair Manage.
-- Latest approved SwiftUPI domain: **https://swiftupi.ca**. The domain did not resolve during reference research; its capabilities and prices are intentionally not asserted.
+- Latest approved SwiftUPI domain: **https://swiftupi.com**. Product details are based on the public official website; payment verification depends on the configured source. No pricing or regulated-payment guarantees are asserted.
 - Chair Manage capabilities come from the user-supplied approved specification.
 - CallVani and Adgrowly reference their official websites and the supplied specification. Illustrative product UI is explicitly labelled and is not presented as production usage or customer results.
 - Nexadly Private Limited is a proposed company name; incorporation is not represented as complete.
@@ -26,7 +26,7 @@ The approved enquiry address is **hello@nexadly.com**. The consultation form pre
 
 ## Publication
 
-This project is registered as an owner-private Sites website. The `.openai/hosting.json` file stores that Site identity, with `dist` as the static directory. Preview pages deliberately use `noindex,nofollow`; robots.txt disallows crawling. The default canonical origin is the private Site URL. Before a public Nexadly launch, confirm the custom domain, indexing settings, company details and any missing SwiftUPI specifications. Set `SITE_ORIGIN` when building for another verified domain.
+This project is registered as an owner-private Sites website. The `.openai/hosting.json` file stores that Site identity, with `dist` as the static directory. Preview pages deliberately use `noindex,nofollow`; robots.txt disallows crawling. The default canonical origin is the private Site URL. Before a public Nexadly launch, confirm the custom domain, indexing settings, company details and current product availability. Set `SITE_ORIGIN` when building for another verified domain.
 
 ## Design and assets
 
@@ -39,7 +39,7 @@ Content references checked on 16 October 2026:
 - User-supplied Nexadly master brief.
 - https://callvani.com
 - https://adgrowly.ca
-- https://swiftupi.ca (unreachable during research)
+- https://swiftupi.com
 
 ## Source layout
 

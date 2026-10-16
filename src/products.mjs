@@ -21,7 +21,7 @@ const external = (p, label = `Visit ${p.name}`) => `<a class="button button-dark
 export const products = [
   { slug: 'callvani', name: 'CallVani', category: 'AI voice & conversations', summary: 'Natural conversations. Thoughtful follow-ups. One connected calling workspace.', domain: 'https://callvani.com', color: '#e5ecb5' },
   { slug: 'adgrowly', name: 'Adgrowly', category: 'Local visibility & growth', summary: 'Bring your Google Business Profiles, content and customer reviews into focus.', domain: 'https://adgrowly.ca', color: '#dcf0db' },
-  { slug: 'swiftupi', name: 'SwiftUPI', category: 'Nexadly product portfolio', summary: 'Meet SwiftUPI. Explore its official website and find the right information for your business.', domain: 'https://swiftupi.ca', color: '#c9e9e7' },
+  { slug: 'swiftupi', name: 'SwiftUPI', category: 'UPI links & collection management', summary: 'Bring payment links, order-specific UPI QR requests and collection records into one organised workflow.', domain: 'https://swiftupi.com', color: '#c9e9e7' },
   { slug: 'chair-manage', name: 'Chair Manage', category: 'Salon & beauty operations', summary: 'A more organised salon day, from the first appointment to the final checkout.', domain: 'https://chairmanage.com', color: '#e6dcf4' },
 ];
 
@@ -88,6 +88,39 @@ const details = {
       ['Does Adgrowly guarantee a Google Maps position?', 'No. Adgrowly provides tools to manage local visibility and understand ranking signals. A specific Google Maps position or ranking improvement is not guaranteed.'],
     ],
   },
+  // Advertised scope checked against https://swiftupi.com/ on 16 October 2026.
+  swiftupi: {
+    headline: 'Your UPI collections.\nA clearer workflow.',
+    description: 'Create payment links and order-specific UPI QR requests, then keep your collection records organised. SwiftUPI helps Indian businesses connect everyday payments with the orders behind them.',
+    intro: 'A more organised home for your UPI collections.',
+    introText: 'Customers pay the UPI ID you connect. SwiftUPI brings payment requests, collection records and reconciliation into a shared workspace, with payment verification depending on your configured source.',
+    featureHeading: 'From a payment request\nto a clearer record.',
+    features: [
+      ['bag', 'A QR for each order', 'Create an order-specific UPI QR with the payable amount included. Amount mismatches remain available for review instead of being marked paid.', ['Order-specific UPI QR requests', 'Exact-amount matching']],
+      ['link', 'Payment links, without code', 'Share a payment link or create a payment page with your own fields. Use a fixed amount or let the payer choose within a range you set.', ['Shareable payment links', 'Payment pages & custom fields']],
+      ['chart', 'Keep collection records in order', 'Compare uploaded bank statements with recorded payments and review unmatched entries. Track full and partial refund records in an audit ledger.', ['Statement reconciliation', 'Refund records & review queues']],
+      ['nodes', 'Connect your order workflow', 'Create orders through the REST API and receive signed payment webhooks. Review delivery logs and replay events from the dashboard.', ['Order creation API', 'Signed webhooks & delivery logs']],
+      ['layers', 'Try the flow in test mode', 'Use separate sandbox keys, orders and webhooks to check your integration. Test payments stay separate from live revenue and ledger records.', ['Separate test and live modes', 'Sandbox orders & webhooks']],
+      ['team', 'Bring your team and updates together', 'Use team roles to manage access. Connect and enable your own messaging channels for receipts, payment confirmations and expiry reminders.', ['Role-based team access', 'Configured WhatsApp & email updates']],
+    ],
+    workflowTitle: 'Request. Review.\nKeep things connected.',
+    workflowText: 'Start in test mode, confirm your collection account and verification source, then connect the workflow your business needs.',
+    workflow: [
+      ['Prepare your collection setup', 'Connect a UPI account permitted for your business use. Confirm account eligibility and your payment verification source before enabling live payments.'],
+      ['Create and share the request', 'Create an order through the API or prepare a payment link in the dashboard. The customer uses their UPI app to pay the connected UPI ID.'],
+      ['Review the payment record', 'Use your configured verification source, webhook updates and reconciliation records to follow each order. Review unmatched payments before treating an order as paid.'],
+    ],
+    useTitle: 'For the way your business collects.',
+    uses: [['Online stores', 'Connect order creation and payment updates through the API.'], ['Service businesses', 'Share payment links for a defined amount.'], ['No-code collections', 'Prepare payment pages with fields relevant to your request.'], ['Operations teams', 'Review payment records and reconciliation exceptions.'], ['Growing teams', 'Manage collection work through team access roles.'], ['Developers', 'Check order and webhook flows in a separate sandbox.']],
+    note: 'Customers pay your connected UPI ID. Payment verification depends on the configured source. Confirm business account eligibility and applicable requirements with your bank or provider. WhatsApp and email delivery require a connected, enabled channel.',
+    faqs: [
+      ['Where do customers send their payment?', 'Customers pay the UPI ID you connect using their UPI app. SwiftUPI describes its role as organising payment requests and collection records; customer funds are not collected into a SwiftUPI pooled account.'],
+      ['How is an order confirmed as paid?', 'Verification depends on your configured payment source and an exact match to the payable amount. A mismatched payment stays in a review queue rather than automatically completing the order. Confirm your source and verification workflow before going live.'],
+      ['Do I need to write code to use SwiftUPI?', 'Payment links and payment pages can be prepared without code. For a connected store or custom workflow, SwiftUPI also advertises an order creation API, signed webhooks, delivery logs and event replay.'],
+      ['Can I test the workflow before accepting live payments?', 'Yes. The advertised sandbox provides separate test keys, orders and webhooks. Test payments are kept out of live revenue and ledger records.'],
+      ['Where can I confirm plans and account requirements?', 'Visit swiftupi.com for current plans and product details. Confirm that your bank or payment provider permits your chosen account for business collections, and review the verification and integration requirements for your setup.'],
+    ],
+  },
   'chair-manage': {
     headline: 'Good hair days.\nBetter business days.',
     description: 'Keep appointments, people and daily operations in sync. Chair Manage brings salon management and customer engagement together so you can focus on the experience in every chair.',
@@ -136,7 +169,7 @@ export function productVisual(slug, compact = false) {
   } else if (slug === 'chair-manage') {
     art = `<div class="px-chair-disc"></div><div class="px-salon-window"><div class="px-window-top">${brandMark(slug)}<strong>The salon day</strong><span>Illustration</span></div><div class="px-calendar-heading"><strong>Your appointments</strong>${icon('calendar')}</div><div class="px-calendar-days"><span>M</span><span>T</span><span class="px-day-active">W</span><span>T</span><span>F</span></div><div class="px-appointment"><span class="px-appointment-dot"></span><div><strong>Cut & styling</strong><small>Appointment booking</small></div>${icon('calendar')}</div><div class="px-appointment px-appointment-muted"><span class="px-appointment-dot"></span><div><strong>Care & colour</strong><small>Service packages</small></div>${icon('sparkle')}</div><div class="px-calendar-footer">A little more organised. Every day.</div></div><div class="px-floating px-loyalty-chip">${icon('heart')}<span>Make every visit count</span></div><div class="px-floating px-staff-chip"><span class="px-avatars"><i>A</i><i>B</i><i>C</i></span><span>Your team, in sync</span></div>`;
   } else {
-    art = `<div class="px-swift-ring px-swift-ring-one"></div><div class="px-swift-ring px-swift-ring-two"></div><div class="px-swift-ring px-swift-ring-three"></div><div class="px-swift-tile"><span class="px-swift-symbol">s<span>↗</span></span><strong>SwiftUPI</strong><small>A Nexadly product</small></div><div class="px-floating px-swift-domain">swiftupi.ca <span>↗</span></div><div class="px-swift-spark px-swift-spark-one">✦</div><div class="px-swift-spark px-swift-spark-two">✦</div>`;
+    art = `<div class="px-swift-ring px-swift-ring-one"></div><div class="px-swift-ring px-swift-ring-two"></div><div class="px-swift-ring px-swift-ring-three"></div><div class="px-swift-tile"><span class="px-swift-symbol">s<span>↗</span></span><strong>SwiftUPI</strong><small>UPI collections</small></div><div class="px-floating px-swift-domain">swiftupi.com <span>↗</span></div><div class="px-swift-spark px-swift-spark-one">✦</div><div class="px-swift-spark px-swift-spark-two">✦</div>`;
   }
   return `<div class="px-visual px-visual-${slug}${compact ? ' px-visual-compact' : ''}" role="img" aria-label="${escape(p.name)} ${slug === 'swiftupi' ? 'brand illustration' : 'concept illustration; sample interface, not live product data'}">${art}<span class="px-illustration-label">${slug === 'swiftupi' ? 'Brand illustration' : 'Illustrative product concept'}</span></div>`;
 }
@@ -151,20 +184,9 @@ const moreProducts = (p) => `<section class="section px-more"><div class="contai
 
 const ctaSection = (p, title = 'See what’s possible<br> for your business.') => `<section class="px-cta"><div class="container"><div><p class="eyebrow">Your next step starts here</p><h2>${title}</h2><p>Explore ${p.name} or talk to us about the way your business works.</p></div><div class="px-cta-actions">${external(p)}<a class="button px-button-outline" href="/contact/?product=${p.slug}">Request a demo ${arrow}</a></div></div></section>`;
 
-function renderSwift(p) {
-  const faqs = [
-    ['Where can I learn more about SwiftUPI?', 'The official product website is swiftupi.ca. You can also contact Nexadly for a product introduction and answers specific to your business.'],
-    ['How do I confirm product capabilities?', 'Share the workflow you want to support with our team. We will help you obtain the relevant product details before you make a decision.'],
-    ['Where can I find current pricing?', 'Confirm current pricing, eligibility and terms directly with the SwiftUPI team through the official website or a product enquiry.'],
-    ['Can I request a product walkthrough?', 'Prepare a product enquiry with the questions you would like to explore, then share it with your Nexadly contact to coordinate the next step.'],
-  ];
-  return `<div class="px-page px-page-swiftupi"><section class="px-hero"><div class="container"><nav class="px-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/products/">Products</a><span>/</span><span>SwiftUPI</span></nav><div class="px-hero-grid"><div class="px-hero-copy"><div class="px-product-label">${brandMark(p.slug)}<span>SwiftUPI <small>A Nexadly product</small></span></div><h1>Meet SwiftUPI.<br> Get the full picture.</h1><p class="lead">Explore SwiftUPI, part of the Nexadly product portfolio. Start with the official website or speak to our team for a guided introduction.</p><div class="px-hero-actions">${external(p)}<a class="button px-button-outline" href="/contact/?product=swiftupi">Make an enquiry ${arrow}</a></div><p class="px-hero-footnote">The right information. A more informed next step.</p></div>${productVisual(p.slug)}</div></div></section><section class="section px-intro"><div class="container"><p class="eyebrow">A closer look</p><h2>A conversation built<br> around your requirements.</h2><p>Every business has its own priorities. Tell us what you are looking for, explore the current product information and confirm the details that matter to your team.</p></div></section><section class="section px-features"><div class="container"><div class="px-section-top"><div><p class="eyebrow">Explore SwiftUPI</p><h2>Your questions.<br> A clear next step.</h2></div><p>Get the information you need<br> straight from the product team.</p></div><div class="px-swift-info-grid"><article class="px-feature-card"><div class="px-feature-icon">${icon('link')}</div><h3>Visit the official website</h3><p>Explore the current product information directly at SwiftUPI’s official home.</p><a class="text-link" href="${p.domain}" target="_blank" rel="noopener noreferrer">Open swiftupi.ca ${arrow}</a></article><article class="px-feature-card"><div class="px-feature-icon">${icon('message')}</div><h3>Talk through your use case</h3><p>Share your business needs and the questions you want answered in a product introduction.</p><a class="text-link" href="/contact/?product=swiftupi">Start a conversation ${arrow}</a></article><article class="px-feature-card"><div class="px-feature-icon">${icon('layers')}</div><h3>Confirm the complete offering</h3><p>Ask the team about available capabilities, eligibility, pricing and terms for your requirements.</p><a class="text-link" href="/contact/?product=swiftupi">Request product details ${arrow}</a></article></div></div></section><section class="section px-workflow"><div class="container px-workflow-inner"><div><p class="eyebrow">Let’s make it useful</p><h2>Your introduction,<br> on your terms.</h2><p class="px-workflow-copy">A focused product conversation starts with what your business needs.</p></div><div class="px-steps"><article class="px-step"><span class="px-step-number">01</span><div><h3>Tell us what you need</h3><p>Describe your business, your current workflow and the outcome you want to explore.</p></div></article><article class="px-step"><span class="px-step-number">02</span><div><h3>Get the relevant information</h3><p>Review the product details and ask for a walkthrough focused on your questions.</p></div></article><article class="px-step"><span class="px-step-number">03</span><div><h3>Choose your next step</h3><p>Confirm the current offering and terms with the product team before moving ahead.</p></div></article></div></div></section>${faqSection(p, faqs)}${ctaSection(p, 'Your business.<br> Your next possibility.')}${moreProducts(p)}</div>`;
-}
-
 export function renderProduct(slug) {
   const p = products.find((item) => item.slug === slug);
   if (!p) return null;
-  if (slug === 'swiftupi') return { title: 'SwiftUPI — Product overview', description: p.summary, body: renderSwift(p) };
   const d = details[slug];
   return {
     title: `${p.name} — ${p.category}`,
