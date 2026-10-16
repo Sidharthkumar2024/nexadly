@@ -1,0 +1,18 @@
+.platforms-section{background:#e8eddf;border-block:1px solid #dce3d1}
+.platforms-section .section-aside{margin-bottom:0;font-size:15px;line-height:1.8}
+.platforms-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.platform-card{display:flex;flex-direction:column;min-width:0;padding:30px;border:1px solid #d6deca;border-radius:18px;background:#f8f9f3;transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.platform-card:hover{transform:translateY(-4px);border-color:#a9b992;box-shadow:0 15px 30px #26371708}
+.platform-card-top{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.platform-symbol{display:grid;place-items:center;width:48px;height:48px;flex-shrink:0;border-radius:14px;background:#dce8c8;color:#384e21}
+.platform-symbol svg{width:25px;height:25px}
+.platform-category{font:9px/1.6 var(--mono);letter-spacing:1px;color:#647452}
+.platform-card h3{font-size:31px;margin-bottom:17px;letter-spacing:-1.1px}
+.platform-card>p{font-size:14px;line-height:1.8;margin-bottom:28px;max-width:320px}
+.platform-link{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:auto;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:#34442a}
+.platform-link svg{width:17px;height:17px;transition:transform .25s ease}
+.platform-card:hover .platform-link svg{transform:translate(2px,-2px)}
+.platforms-note{margin:24px 0 0;max-width:750px;color:#68745d;font-size:11px;line-height:1.8}
+@media(max-width:1000px){.platforms-grid{gap:14px}.platform-card{padding:24px}.platform-card-top{display:block}.platform-category{display:block;margin-top:14px}.platform-link{align-items:flex-start}}
+@media(max-width:700px){.platforms-grid{grid-template-columns:1fr;gap:14px}.platform-card{padding:26px}.platform-card-top{display:flex;margin-bottom:24px}.platform-category{margin-top:0}.platform-card>p{max-width:none}.platforms-section .section-aside{font-size:14px}.platforms-note{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.platform-card,.platform-link svg{transition:none}.platform-card:hover,.platform-card:hover .platform-link svg{transform:none}}

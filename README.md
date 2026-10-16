@@ -17,7 +17,7 @@ Open http://localhost:4377. Run `npm run build` after changes; `npm run check` c
 - Latest approved SwiftUPI domain: **https://swiftupi.com**. Product details are based on the public official website; payment verification depends on the configured source. No pricing or regulated-payment guarantees are asserted.
 - Chair Manage capabilities come from the user-supplied approved specification.
 - CallVani and Adgrowly reference their official websites and the supplied specification. Illustrative product UI is explicitly labelled and is not presented as production usage or customer results.
-- Public website branding uses Nexadly; the project agreement identifies the contracting party.
+- Public website branding uses Nexadly; the project agreement identifies the contracting party. The owner states that the business is registered in India and registered in Canada under Adgrowly. Exact legal entity names, registration identifiers and addresses have not been supplied. No registry verification is implied.
 - Project pricing is presented in US dollars (USD). No fixed USD amount or package inclusions are inferred; the written proposal confirms the price, scope and additional costs. Shopify has a separate service page, without an assumed fixed package price.
 - The owner stated that Nexadly has worked with 100+ clients and primarily serves Canada and the United States. No client names, logos, testimonials, ratings, results or affiliations are fabricated.
 - All 19 service pages include tailored deliverables, a delivery process, FAQs and enquiry links. Terms and Privacy pages reflect the current static-site behavior; legal operator/contact address and actual mailbox retention/hosting arrangements still need confirmation before public launch.
@@ -62,3 +62,5 @@ The custom Nexadly code-bracket N mark with a data node and Technology & AI word
 ## Source repository
 
 Source: https://github.com/Sidharthkumar2024/nexadly. Run `npm run build` to generate `dist/`; the generated directory is intentionally ignored in Git. The tracked `.openai/hosting.json` identifies the existing private Sites deployment and contains no access token.
+
+Platform service references to Meta Ads, Google Ads and OpenAI describe independent expertise. No official partnership badges, endorsements or fabricated customer testimonials are used. Official partnership claims require corresponding verification.
