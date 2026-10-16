@@ -22,7 +22,6 @@ jobs:
     env:
       SITE_ORIGIN: https://nexadly.com
       SITE_INDEXING: public
-      NEXADLY_RELEASE_DIR: ${{ runner.temp }}/nexadly-release
     steps:
       - name: Check out this exact main commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -38,8 +37,9 @@ jobs:
           npm run check
           python3 -m unittest discover -s deploy/tests -p 'test_*.py'
       - name: Package static files and checksums
-        run: python3 deploy/package_static.py --dist dist --commit "$GITHUB_SHA" --output-dir "$NEXADLY_RELEASE_DIR"
+        run: python3 deploy/package_static.py --dist dist --commit "$GITHUB_SHA" --output-dir "$RUNNER_TEMP/nexadly-release"
       - name: Publish checked static release assets
         env:
           GH_TOKEN: ${{ github.token }}
+          NEXADLY_RELEASE_DIR: ${{ runner.temp }}/nexadly-release
         run: python3 deploy/publish_release.py
