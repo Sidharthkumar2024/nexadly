@@ -1,0 +1,10 @@
+Use case: ads-marketing
+Asset type: Premium wide 16:9 full-bleed website hero background for Nexadly, a modern SaaS and intelligent automation studio.
+Primary request: An original editorial campaign image, photorealistic CGI photographed like a luxury material sculpture. Close-up of a beautifully sculpted continuous interlocking loop of iridescent translucent glass, representing connected intelligent systems.
+Scene/backdrop: Olive-green silky atmospheric background, pale and luminous in the top-right, fading naturally into deep olive across the lower third.
+Subject: One substantial abstract glass loop sculpture with broad smooth ribbon surfaces and liquid-chrome edges, centered in the upper half. Its intricate overlapping continuous form feels fluid and elegant, with realistic depth and refraction.
+Style/medium: Ultra high fidelity tactile photorealistic CGI, sophisticated luxury technology campaign photography, subtle fine texture, no illustration aesthetic.
+Composition/framing: Wide horizontal 16:9 crop. Sculpture large and visually dominant in the upper and central composition. Generous darker relatively calm space across the lower third where a website will overlay a large white centered headline. Keep the subject recognizable in a central mobile crop.
+Lighting/mood: Warm natural diffused light, soft lime illumination, subtle cyan and spectral prism reflections through clear glass, elegant technology optimism.
+Color palette: Olive, lime, translucent glass, liquid chrome, tiny soft cyan and prism highlights.
+Constraints: Image only, no writing of any kind. No logos, words, letters, numbers, graphs, user interfaces, people, devices, watermarks, stock office elements, busy cyberpunk or flat vector imagery. Do not render a headline; the website adds it separately.
