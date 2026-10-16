@@ -18,15 +18,19 @@ Open http://localhost:4377. Run `npm run build` after changes; `npm run check` c
 - Chair Manage capabilities come from the user-supplied approved specification.
 - CallVani and Adgrowly reference their official websites and the supplied specification. Illustrative product UI is explicitly labelled and is not presented as production usage or customer results.
 - Nexadly Private Limited is a proposed company name; incorporation is not represented as complete.
-- Prices, client logos, client testimonials, guaranteed results and unverified affiliations are not fabricated.
+- The owner approved the ₹20,000 INR e-commerce website offer. No package inclusions, taxes or third-party costs are inferred; the written proposal sets the scope. Shopify has a separate service page, without an assumed fixed package price.
+- The owner stated that Nexadly has worked with 100+ clients and primarily serves Canada and the United States. No client names, logos, testimonials, ratings, results or affiliations are fabricated.
+- All 19 service pages include tailored deliverables, a delivery process, FAQs and enquiry links. Terms and Privacy pages reflect the current static-site behavior; legal operator/contact address and actual mailbox retention/hosting arrangements still need confirmation before public launch.
 
 ## Contact behavior
 
 The approved enquiry address is **hello@nexadly.com**. The consultation form prepares a `mailto:` enquiry for the visitor to review and send from their own email application. A local `.txt` download is provided as a fallback. The site does not claim to deliver mail itself, and it does not store form data or send form data to a server. SMTP/API delivery would require a separate verified provider integration.
 
+The WhatsApp button is conditional on `NEXADLY_WHATSAPP_NUMBER`, an owner-approved international business number. Leave it unset until the owner provides the number; no placeholder or unrelated destination is shown.
+
 ## Publication
 
-This project is registered as an owner-private Sites website. The `.openai/hosting.json` file stores that Site identity, with `dist` as the static directory. Preview pages deliberately use `noindex,nofollow`; robots.txt disallows crawling. The default canonical origin is the private Site URL. Before a public Nexadly launch, confirm the custom domain, indexing settings, company details and current product availability. Set `SITE_ORIGIN` when building for another verified domain.
+This project is registered as an owner-private Sites website. The `.openai/hosting.json` file stores that Site identity, with `dist` as the static directory. Preview pages deliberately use `noindex,nofollow`; robots.txt disallows crawling. The default canonical origin is the private Site URL. Before a public Nexadly launch, confirm the custom domain, indexing settings, company details and current product availability. An approved public launch requires both `SITE_INDEXING=public` and an explicit HTTPS `SITE_ORIGIN` outside the preview hostname. The default private sitemap is intentionally empty. Canonical, social metadata, visible breadcrumbs and structured Organization/WebSite/WebPage/Service data are generated centrally in `src/seo.mjs`.
 
 ## Design and assets
 
@@ -50,3 +54,7 @@ Content references checked on 16 October 2026:
 - `public/`: CSS, interaction script and original assets.
 - `build.mjs`: static generation, sitemap and private-preview indexing settings.
 - `serve.mjs`: loopback-only development server with proper 404 handling.
+
+## Motion and accessibility
+
+The custom Nexadly ribbon mark is available in dark/light SVG variants and a matching favicon. Progressive scroll reveals, button/card interactions and supported cross-document transitions respect reduced-motion preferences. Core content remains visible with JavaScript disabled.
